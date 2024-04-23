@@ -8,10 +8,12 @@ from models.base import Base
 from models.user import User
 from models.course import Course
 from models.subject import Subject
+from models.student import Student
+from models.instructor import Instructor
 import shlex  # for splitting the line along spaces except in double quotes
 
-classes = {"User": User, "Base": Base, "Course": Course,
-           "Subject": Subject}
+classes = {"Base": Base, "Course": Course,
+           "Subject": Subject, "Student": Student, "Instructor": Instructor}
 
 
 class EDUCommand(cmd.Cmd):
@@ -59,12 +61,37 @@ class EDUCommand(cmd.Cmd):
             return False
         if args[0] in classes:
             new_dict = self._key_value_parser(args[1:])
-            instance = classes[args[0]](**new_dict)
+            if args[0] == "Course":
+                if "subject_id" not in new_dict:
+                    print("** no subject_id **")
+                    return
+                if "instructor_id" not in new_dict:
+                    print("** no instructor_id")
+                    return
+                else:
+                    subject = models.storage.get(Subject, new_dict["subject_id"])
+                    instructor = models.storage.get(Instructor, new_dict["instructor_id"])
+                    if subject is None:
+                        print("** subject not found in dababase **")
+                        return
+                    if instructor is None:
+                        print("** instructor not found in database **")
+                        return
+                    instance = Course(**new_dict)
+                    
+
+                    subject.courses.append(instance)
+                    # instructor.courses.append(instance)
+                    instance.instructors.append(instructor)                
+                    # print(course)
+            else:    
+                instance = classes[args[0]](**new_dict)
         else:
             print("** class doesn't exist **")
             return False
         print(instance.id)
         instance.save()
+        # models.storage.relationship_manager(instance)
 
     def do_show(self, arg):
         """Prints an instance as a string based on the class and id"""
@@ -91,12 +118,20 @@ class EDUCommand(cmd.Cmd):
             print("** class name missing **")
         elif args[0] in classes:
             if len(args) > 1:
-                key = args[0] + "." + args[1]
-                if key in models.storage.all():
-                    models.storage.all().pop(key)
+                
+                obj = models.storage.get(classes[args[0]], args[1])
+                if obj is not None:
+                    models.storage.delete(obj)
                     models.storage.save()
                 else:
                     print("** no instance found **")
+
+                # key = args[0] + "." + args[1]
+                # if key in models.storage.all():
+                #     models.storage.all().pop(key)
+                #     models.storage.save()
+                # else:
+                #     print("** no instance found **")
             else:
                 print("** instance id missing **")
         else:
@@ -120,42 +155,71 @@ class EDUCommand(cmd.Cmd):
         print("]")
 
     def do_update(self, arg):
-        """Update an instance based on the class name, id, attribute & value"""
+        """Updates an instance based on the class name, id, and attributes"""
         args = shlex.split(arg)
-        integers = ["number_rooms", "number_bathrooms", "max_guest",
-                    "price_by_night"]
-        floats = ["latitude", "longitude"]
         if len(args) == 0:
             print("** class name missing **")
-        elif args[0] in classes:
-            if len(args) > 1:
-                k = args[0] + "." + args[1]
-                if k in models.storage.all():
-                    if len(args) > 2:
-                        if len(args) > 3:
-                            if args[0] == "Place":
-                                if args[2] in integers:
-                                    try:
-                                        args[3] = int(args[3])
-                                    except:
-                                        args[3] = 0
-                                elif args[2] in floats:
-                                    try:
-                                        args[3] = float(args[3])
-                                    except:
-                                        args[3] = 0.0
-                            setattr(models.storage.all()[k], args[2], args[3])
-                            models.storage.all()[k].save()
-                        else:
-                            print("** value missing **")
-                    else:
-                        print("** attribute name missing **")
+            return False
+        if args[0] in classes:
+            if len(args) > 2:
+                obj = models.storage.get(classes[args[0]], args[1])
+                # print(obj)
+                if obj is not None:
+                    attributes = {}
+                    attributes = self._key_value_parser(args[1:])
+                    # print(attributes)
+                    for k, v in attributes.items():
+                        setattr(obj, k, v)
+                        # print(obj)
+                        # print(k, v)
+                # key = args[0] + "." + args[1]
+                # if key in models.storage.all():
+                #     obj = models.storage.all()[key]
+
+                #     new_dict = self._key_value_parser(args[2:])
+
+                #     for k, v in new_dict.items():
+                #         setattr(obj, k, v)
+                #     obj.save()
+                    obj.save()
+                    # obj = models.storage.get(classes[args[0]], args[1])
+                    # print(obj)
                 else:
                     print("** no instance found **")
             else:
-                print("** instance id missing **")
+                print("** instance id and/or attributes missing **")
         else:
             print("** class doesn't exist **")
+    
+    def do_enroll(self, arg):
+        """ Enrolls a student in a course
+            enroll <student_id> <course_id>
+        """
+        args = shlex.split(arg)
+        if len(args) < 2:
+            print("** missing ids/ Usage :enroll <student_id> <course_id>**")
+            return
+        
+        student = models.storage.get(Student, args[0])
+        course = models.storage.get(Course, args[1])
+        if student is None and course is None:
+            print("** Student instance and Course instance\
+not found Usage : enroll <student_id> <course_id>**")
+            return
+        if student is None:
+            print("** Student instance not found Usage :\
+enroll <student_id> <course_id>**")
+            return
+        
+        if course is None:
+            print("** Course instance not found Usage :\
+enroll <student_id> <course_id>**")
+            return
+        
+
+        course.students.append(student)
+        models.storage.save()
+        
 
 if __name__ == '__main__':
     EDUCommand().cmdloop()

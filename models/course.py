@@ -8,31 +8,21 @@ from sqlalchemy import Column, String, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
 
-course_subject = Table('course_subject', BaseDB.metadata,
-                       Column('course_id', String(60),
-                              ForeignKey('courses.id', onupdate='CASCADE',
-                                         ondelete='CASCADE'),
-                              primary_key=True),
-                       Column('subject_id', String(60),
-                              ForeignKey('subjects.id', onupdate='CASCADE',
-                                         ondelete='CASCADE'),
-                              primary_key=True))
-
-
 class Course(Base, BaseDB):
     """ Course Class definition """
     __tablename__ = 'courses'
     subject_id = Column(String(60), ForeignKey('subjects.id'), nullable=False)
-    user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
-    user_role = Column(String(60), ForeignKey('users.role'), nullable=False)
-    title = Column(String(128), nullable=False)
+    student_id = Column(String(60), ForeignKey('students.id'), nullable=True)
+    instructor_id = Column(String(60), ForeignKey('instructors.id'), nullable=False)
+
+    title = Column(String(128), nullable=True)
     description = Column(String(1024), nullable=True)
-    users = relationship("User", backref="courses")
-    subjects = relationship("Subject",
-                                 secondary=course_subject,
-                                 viewonly=False)
+    subject = relationship("Subject", back_populates="courses")
+    students = relationship("Student", secondary="student_courses",
+                            viewonly=False, back_populates="courses")
+    instructors = relationship("Instructor", secondary="instructor_courses",
+                               viewonly=False, back_populates="courses")
 
     def __init__(self, *args, **kwargs):
         """ initializes user """
         super().__init__(*args, **kwargs)
-

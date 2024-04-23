@@ -8,15 +8,15 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
 
-class User(Base, BaseDB):
+class User(Base):
     """ User Class definition """
-    __tablename__ = 'users'
-    username = Column(String(128), nullable=False)
-    email = Column(String(128), nullable=False)
-    password = Column(String(128), nullable=False)
-    role = Column(String(128), nullable=False)
+    username = Column(String(128), nullable=True)
+    email = Column(String(128), nullable=True)
+    password = Column(String(128), nullable=True)
+    # role = Column(String(128), nullable=False)
     first_name = Column(String(128), nullable=True)
     last_name = Column(String(128), nullable=True)
+    
 
     def __init__(self, *args, **kwargs):
         """ initializes user """

@@ -6,4 +6,5 @@ from models.engine.db_storage import DBStorage
 
 storage = DBStorage()
 
+# storage.register_user()
 storage.reload()
