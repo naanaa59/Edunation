@@ -31,7 +31,12 @@ CREATE TABLE IF NOT EXISTS courses (
     FOREIGN KEY (subject_id) REFERENCES subjects(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
+-- Table: students
+CREATE TABLE IF NOT EXISTS students (
+    user_id INT PRIMARY KEY,
+    grade VARCHAR(60)
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
 -- Create relationship table: course_subject
 CREATE TABLE IF NOT EXISTS course_subject (
     course_id INT,
