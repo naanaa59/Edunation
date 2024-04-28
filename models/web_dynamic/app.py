@@ -186,6 +186,42 @@ def delete_course(course_id):
     course.delete()
     return jsonify({'message': 'Course deleted successfully'}), 200
 
+from flask import jsonify, request, render_template
+from models import storage
+from models.student import Student
+from models.course import Course
+
+# Enroll a student in a course
+@app.route('/courses/<int:course_id>/enroll/<int:student_id>', methods=['POST'])
+def enroll_student(course_id, student_id):
+    course = storage.get(Course, course_id)
+    student = storage.get(Student, student_id)
+
+    if not course or not student:
+        return jsonify({'error': 'Course or student not found'}), 404
+
+    if student in course.students:
+        return jsonify({'error': 'Student already enrolled in the course'}), 400
+
+    course.students.append(student)
+    course.save()
+    return jsonify({'message': 'Student enrolled successfully'}), 200
+
+# Unenroll a student from a course
+@app.route('/courses/<int:course_id>/unenroll/<int:student_id>', methods=['POST'])
+def unenroll_student(course_id, student_id):
+    course = storage.get(Course, course_id)
+    student = storage.get(Student, student_id)
+
+    if not course or not student:
+        return jsonify({'error': 'Course or student not found'}), 404
+
+    if student not in course.students:
+        return jsonify({'error': 'Student is not enrolled in the course'}), 400
+
+    course.students.remove(student)
+    course.save()
+    return jsonify({'message': 'Student unenrolled successfully'}), 200
 
 
 
