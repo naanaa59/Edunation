@@ -35,6 +35,9 @@ class DBStorage:
                                               EDU_MYSQL_PWD,
                                               EDU_MYSQL_HOST,
                                               EDU_MYSQL_DB))
+        if EDU_ENV == "test":
+            BaseDB.metadata.drop_all(self.__engine)
+        self.__session = scoped_session(sessionmaker(bind=self.__engine))
 
         if EDU_ENV == "test":
             BaseDB.metadata.drop_all(self.__engine)
@@ -86,6 +89,11 @@ class DBStorage:
                     return value
         return None
     
+    def clear_data(self):
+        """ Clear all data from the database without dropping the schema """
+        self.__session.rollback() # Rollback the nested transaction
+        self.__session.begin_nested() # Start a new nested transaction
+        self.close()
     # def relationship_manager(self, obj):
     #     """ This function sets relationships in database for created obj"""
     #     if isinstance(obj, Student):

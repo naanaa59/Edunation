@@ -8,8 +8,8 @@ from models.base import Base
 from models.user import User
 from models.course import Course
 from models.subject import Subject
-from models.student import Student
-from models.instructor import Instructor
+from models.student import Student, StudentCourses
+from models.instructor import Instructor, InstructorCourses
 import shlex  # for splitting the line along spaces except in double quotes
 
 classes = {"Base": Base, "Course": Course,
@@ -78,11 +78,13 @@ class EDUCommand(cmd.Cmd):
                         print("** instructor not found in database **")
                         return
                     instance = Course(**new_dict)
-                    
+                    inst_c_instance = InstructorCourses(instructor_id= instructor.id,
+                                                        course_id=instance.id)
 
                     subject.courses.append(instance)
                     # instructor.courses.append(instance)
-                    instance.instructors.append(instructor)                
+                    instance.instructor_courses.append(inst_c_instance)      
+                    instructor.instructor_courses.append(inst_c_instance)          
                     # print(course)
             else:    
                 instance = classes[args[0]](**new_dict)
@@ -216,8 +218,10 @@ enroll <student_id> <course_id>**")
 enroll <student_id> <course_id>**")
             return
         
-
-        course.students.append(student)
+        enrollment = StudentCourses(student_id=student.id, course_id=course.id)
+        course.student_courses.append(enrollment)
+        student.student_courses.append(enrollment)
+        # course.students.append(student)
         models.storage.save()
         
 

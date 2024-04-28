@@ -16,12 +16,15 @@ class Course(Base, BaseDB):
     instructor_id = Column(String(60), ForeignKey('instructors.id'), nullable=False)
 
     title = Column(String(128), nullable=True)
-    description = Column(String(1024), nullable=True)
+    # link_video = Column(String(1000), nullable=True)
+    description = Column(String(15000), nullable=True)
     subject = relationship("Subject", back_populates="courses")
-    students = relationship("Student", secondary="student_courses",
-                            viewonly=False, back_populates="courses")
-    instructors = relationship("Instructor", secondary="instructor_courses",
-                               viewonly=False, back_populates="courses")
+    # students = relationship("Student", secondary="StudentCourses",
+    #                         viewonly=False, back_populates="courses")
+    student_courses = relationship("StudentCourses", back_populates="courses")
+    # instructors = relationship("Instructor", secondary="instructor_courses",
+    #                            viewonly=False, back_populates="courses")
+    instructor_courses = relationship("InstructorCourses", back_populates="courses")
 
     def __init__(self, *args, **kwargs):
         """ initializes user """
