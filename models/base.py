@@ -12,8 +12,10 @@ time = "%Y-%m-%dT%H:%M:%S.%f"
 BaseDB = declarative_base()
 
 
-class Base:
+class Base:    
     """ The Base class from which other classes will be derived """
+    __abstract__ = True
+    __allow_unmapped__ = True
     id = Column(String(60), primary_key=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)

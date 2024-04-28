@@ -9,6 +9,7 @@ from sqlalchemy.orm import relationship
 
 
 class User(Base):
+    __abstract__ = True
     """ User Class definition """
     username = Column(String(128), nullable=True)
     email = Column(String(128), nullable=True)
