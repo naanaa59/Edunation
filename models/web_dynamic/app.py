@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, render_template
+from flask import abort, Flask, jsonify, request, render_template
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models.subject import Subject
@@ -9,9 +9,10 @@ from models.base import Base
 from models import storage
 from models.engine.db_storage import BaseDB
 from os import getenv
+from flask_cors import CORS
 
 app = Flask(__name__)
-
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.teardown_appcontext
 def close_db(error):
@@ -24,7 +25,21 @@ def close_db(error):
 def get_subjects():
     subjects = storage.all(Subject).values()
     
-    return render_template("subjects_courses.html", subjects=subjects)
+    return jsonify([subject.to_dict() for subject in subjects])
+
+@app.route('/subjects/<subject_id>/courses', methods=['GET'])
+def get_courses_subject_id(subject_id):
+    subject = storage.get(Subject, subject_id)
+
+    if not subject:
+        abort(404)
+    list_courses = []
+    for course in subject.courses:
+        list_courses.append(course.to_dict())
+
+    return jsonify(list_courses)
+
+    
 
 @app.route('/subjects/<int:subject_id>', methods=['GET'])
 def get_subject(subject_id):
@@ -146,7 +161,7 @@ def delete_student(student_id):
 @app.route('/courses', methods=['GET'])
 def get_courses():
     courses = storage.all(Course).values()
-    return render_template("courses.html", courses=courses)
+    return jsonify([course.to_dict() for course in courses])
 
 @app.route('/courses/<int:course_id>', methods=['GET'])
 def get_course(course_id):
