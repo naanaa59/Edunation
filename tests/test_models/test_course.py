@@ -1,88 +1,104 @@
-# import unittest
-# from models.subject import Subject
-# from models.course import Course
-# from models.instructor import Instructor
-# from models.engine.db_storage import DBStorage, BaseDB
-# from os import getenv
+""" This script test the course module"""
+import unittest
+from models.course import Course
+from models.subject import Subject
+from models.instructor import Instructor
+from models import storage
 
-
-# class TestDBStorage(unittest.TestCase):
-#     """ Test cases for the DBStorage class """
-#     def setUp(self):
-#         """ Set up test environment """
-#         EDU_MYSQL_USER = getenv("EDU_MYSQL_USER")
-#         EDU_MYSQL_PWD = getenv("EDU_MYSQL_PWD")
-#         EDU_MYSQL_HOST = getenv("EDU_MYSQL_HOST")
-#         EDU_MYSQL_DB = getenv("EDU_MYSQL_DB")
-
-#         # Create a separate database for testing
-#         test_db_name = EDU_MYSQL_DB + "_test"  # Append '_test' to the database name
-#         test_engine_url = f'mysql+mysqldb://{EDU_MYSQL_USER}:{EDU_MYSQL_PWD}@{EDU_MYSQL_HOST}/{test_db_name}'
+class TestCourse(unittest.TestCase):
+    def test_create_course(self):
+        """ Test creating a Course instance"""
+        subject = Subject(name="It", description="Computer Science")
+        instructor = Instructor(first_name="Emily", last_name="Davis", level="Intermediate")
+        storage.new(subject)
+        storage.save()
+        storage.new(instructor)
+        storage.save()
+        course = Course(instructor_id=instructor.id, subject_id=subject.id, title="Python Programming",
+                        description="Learn Python programming")
         
-#         self.__test_engine = create_engine(test_engine_url)
 
-#         # Create all tables for the test engine
-#         BaseDB.metadata.create_all(self.__test_engine)
+        self.assertIsInstance(course, Course)
+        storage.delete(subject)
+        storage.save()
+        storage.delete(instructor)
+        storage.save()
+        
 
-#         # Create a session for the test engine
-#         self.__test_session = sessionmaker(bind=self.__test_engine)()
+    def test_save_course(self):
+        """ Test saving a Course instance"""
+        subject = Subject(name="It", description="Computer Science")
+        instructor = Instructor(first_name="Emily", last_name="Davis", level="Intermediate")
+        storage.new(subject)
+        storage.save()
+        storage.new(instructor)
+        storage.save()
+        course = Course(instructor_id=instructor.id, subject_id=subject.id, title="Python Programming",
+                        description="Learn Python programming")
+        
+        storage.new(course)
+        storage.save()
+        self.assertIn(course, storage.all(Course).values())
+        storage.delete(course)
+        storage.save()
+        storage.delete(subject)
+        storage.save()
+        storage.delete(instructor)
+        storage.save()
+    
+    def test_delete_course(self):
+        """ Test deleting a Course instance """
+        subject = Subject(name="It", description="Computer Science")
+        instructor = Instructor(first_name="Emily", last_name="Davis", level="Intermediate")
+        storage.new(subject)
+        storage.save()
+        storage.new(instructor)
+        storage.save()
+        course = Course(instructor_id=instructor.id, subject_id=subject.id, title="Python Programming",
+                        description="Learn Python programming")
+        
+        storage.new(course)
+        storage.save()
+        self.assertIn(course, storage.all(Course).values())
+        storage.delete(course)
+        storage.save()
+        storage.delete(subject)
+        storage.save()
+        storage.delete(instructor)
+        storage.save()
+        self.assertNotIn(course, storage.all(Course).values())
 
-#     def tearDown(self):
-#         """ Clean up after each test """
-#         self.storage.close()
+    def test_invalid_object_retrieval(self):
+        """ Test retrieving a non-existent object """
+        retrieved_course = storage.get(Course, "nonexistent_id")
+        self.assertIsNone(retrieved_course)
+        
+    def test_invalid_object_deletion(self):
+        """ Test deleting a non-existent object """
+        subject = Subject(name="It", description="Computer Science")
+        instructor = Instructor(first_name="Emily", last_name="Davis", level="Intermediate")
+        storage.new(subject)
+        storage.save()
+        storage.new(instructor)
+        storage.save()
+        invalid_subject = Course(instructor_id=instructor.id, subject_id=subject.id, title="Python Programming",
+                        description="Learn Python programming")
 
-#     def test_create_course(self):
-#         """ Test creating a new Course object """
-#         subject = Subject()
-#         instructor = Instructor()
+        # Save the object to the database
+        storage.new(invalid_subject)
+        storage.save()
 
-#         self.storage.new(subject)
-#         self.storage.new(instructor)
-#         self.storage.save()
+        # Now attempt to delete the object without committing immediately
+        storage.delete(invalid_subject)
 
-#         course = Course(subject_id=subject.id, instructor_id=instructor.id)
-#         self.storage.new(course)
-#         self.storage.save()
+        # Check if the object is still present before committing
+        self.assertIn(invalid_subject, storage.all(Course).values())
 
-#         result = self.storage.get(Course, course.id)
-#         self.assertIsNotNone(result)
-#         self.assertEqual(result.id, course.id)
+        # Explicitly commit the changes after the deletion
+        storage.save()
 
-#     def test_query_course(self):
-#         """ Test querying a Course object """
-#         subject = Subject()
-#         instructor = Instructor()
+        # Check if the object is not present in the storage after committing
+        self.assertNotIn(invalid_subject, storage.all(Course).values())
 
-#         self.storage.new(subject)
-#         self.storage.new(instructor)
-#         self.storage.save()
-
-#         course = Course(subject_id=subject.id, instructor_id=instructor.id)
-#         self.storage.new(course)
-#         self.storage.save()
-
-#         result = self.storage.get(Course, course.id)
-#         self.assertIsNotNone(result)
-#         self.assertEqual(result.id, course.id)
-
-#     def test_delete_course(self):
-#         """ Test deleting a Course object """
-#         subject = Subject()
-#         instructor = Instructor()
-
-#         self.storage.new(subject)
-#         self.storage.new(instructor)
-#         self.storage.save()
-
-#         course = Course(subject_id=subject.id, instructor_id=instructor.id)
-#         self.storage.new(course)
-#         self.storage.save()
-
-#         self.storage.delete(course)
-#         self.storage.save()
-
-#         result = self.storage.get(Course, course.id)
-#         self.assertIsNone(result)
-
-# if __name__ == '__main__':
-#     unittest.main()
+if __name__ == '__main__':
+    unittest.main()
