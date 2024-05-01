@@ -1,5 +1,5 @@
 use edu_dev_db;
-drop tables if exists subject_courses;
+
 drop tables if exists instructor_courses;
 drop tables if exists student_courses;
 drop tables if exists courses;
