@@ -14,7 +14,7 @@ class Course(Base, BaseDB):
     subject_id = Column(String(60), ForeignKey('subjects.id'), nullable=False)
     student_id = Column(String(60), ForeignKey('students.id'), nullable=True)
     instructor_id = Column(String(60), ForeignKey('instructors.id'), nullable=False)
-
+    link_photo = Column(String(1000), nullable=True)
     title = Column(String(128), nullable=True)
     # link_video = Column(String(1000), nullable=True)
     description = Column(String(15000), nullable=True)
