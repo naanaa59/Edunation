@@ -51,6 +51,7 @@ class EDUCommand(cmd.Cmd):
                         except:
                             continue
                 new_dict[key] = value
+        # print("parsed args:", new_dict)
         return new_dict
 
     def do_create(self, arg):
@@ -82,10 +83,8 @@ class EDUCommand(cmd.Cmd):
                                                         course_id=instance.id)
 
                     subject.courses.append(instance)
-                    # instructor.courses.append(instance)
                     instance.instructor_courses.append(inst_c_instance)      
                     instructor.instructor_courses.append(inst_c_instance)          
-                    # print(course)
             else:    
                 instance = classes[args[0]](**new_dict)
         else:
@@ -159,40 +158,38 @@ class EDUCommand(cmd.Cmd):
     def do_update(self, arg):
         """Updates an instance based on the class name, id, and attributes"""
         args = shlex.split(arg)
-        if len(args) == 0:
-            print("** class name missing **")
+        print("Input args:", args)  # Debug print
+        if len(args) < 3:
+            print("** incomplete command **")
             return False
-        if args[0] in classes:
-            if len(args) > 2:
-                obj = models.storage.get(classes[args[0]], args[1])
-                # print(obj)
-                if obj is not None:
-                    attributes = {}
-                    attributes = self._key_value_parser(args[1:])
-                    # print(attributes)
-                    for k, v in attributes.items():
-                        setattr(obj, k, v)
-                        # print(obj)
-                        # print(k, v)
-                # key = args[0] + "." + args[1]
-                # if key in models.storage.all():
-                #     obj = models.storage.all()[key]
 
-                #     new_dict = self._key_value_parser(args[2:])
+        class_name = args[0]
+        if class_name not in classes:
+            print(f"** class '{class_name}' doesn't exist **")
+            return False
 
-                #     for k, v in new_dict.items():
-                #         setattr(obj, k, v)
-                #     obj.save()
-                    obj.save()
-                    # obj = models.storage.get(classes[args[0]], args[1])
-                    # print(obj)
-                else:
-                    print("** no instance found **")
-            else:
-                print("** instance id and/or attributes missing **")
-        else:
-            print("** class doesn't exist **")
-    
+        obj_id = args[1]
+        obj = models.storage.get(classes[class_name], obj_id)
+        if obj is None:
+            print(f"** no instance found with id '{obj_id}' for class '{class_name}' **")
+            return False
+
+        # Extract key-value pairs from the argument list
+        attributes = {}
+        for arg in args[2:]:
+            if "=" in arg:
+                kvp = arg.split('=', 1)
+                key = kvp[0]
+                value = kvp[1].strip('"')
+                attributes[key] = value
+
+        # print("Parsed attributes:", attributes)  # Debug print
+        for k, v in attributes.items():
+            setattr(obj, k, v)
+        models.storage.save()
+
+        print(f"** instance '{obj_id}' updated **")
+
     def do_enroll(self, arg):
         """ Enrolls a student in a course
             enroll <student_id> <course_id>
@@ -219,6 +216,8 @@ enroll <student_id> <course_id>**")
             return
         
         enrollment = StudentCourses(student_id=student.id, course_id=course.id)
+        models.storage.new(enrollment)
+        models.storage.save()
         course.student_courses.append(enrollment)
         student.student_courses.append(enrollment)
         # course.students.append(student)
