@@ -19,25 +19,30 @@ class StudentCourses(BaseDB):
     """ Represents the student_courses table """
 
     __tablename__ = 'student_courses'
-
-    student_id = Column(String(60), ForeignKey('students.id'), primary_key=True)
-    course_id = Column(String(60), ForeignKey('courses.id'), primary_key=True)
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
+    
+    student_id = Column(String(60), ForeignKey('students.id'), nullable=True,
+                        primary_key=False)
+    course_id = Column(String(60), ForeignKey('courses.id', ondelete='CASCADE'),
+                       nullable=True, primary_key=True)
 
     students = relationship("Student", back_populates="student_courses")
     courses = relationship("Course", back_populates="student_courses")
-    
 
-    
 
 
 class Student(User, BaseDB):
     """ Subject Class definition """
     __tablename__ = 'students'
-    # user_id = Column(String(60), primary_key=True, nullable=False)
+    __mapper_args__ = {
+        'confirm_deleted_rows': False
+    }
+
     grade = Column(String(128), nullable=True)
     student_courses = relationship("StudentCourses", back_populates="students")
-#     courses = relationship("Course", secondary=StudentCourses,
-#                            viewonly=False, back_populates="students")
+
        
     def __init__(self, *args, **kwargs):
         """ initializes student """
