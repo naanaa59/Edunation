@@ -1,5 +1,5 @@
 import React from 'react';
-import { createRoot } from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './scenes/HomePage';
 import AboutPage from './scenes/AboutPage';
@@ -7,8 +7,10 @@ import LoginPage from './scenes/LoginPage';
 import CoursesPage from './scenes/CoursesPage';
 import NotFoundPage from './scenes/NotFoundPage';
 import StudentPage from './scenes/StudentPage';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 createRoot(document.getElementById('root')).render(
+  <GoogleOAuthProvider clientId='445798157623-f2cl4ha3cqdi44i9jl6nuaul219o4ttj.apps.googleusercontent.com' >
   <Router>
     <Routes>
       <Route exact path='login' element={<LoginPage />} />
@@ -19,4 +21,5 @@ createRoot(document.getElementById('root')).render(
       <Route exact path="/404" element={<NotFoundPage/>}/>
     </Routes>
   </Router>
+  </GoogleOAuthProvider>
 );
