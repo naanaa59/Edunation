@@ -12,8 +12,9 @@ from sqlalchemy import create_engine
 from models.base import Base, BaseDB
 from os import getenv
 from sqlalchemy.orm import scoped_session, sessionmaker
+from dotenv import load_dotenv
 
-
+load_dotenv()
 classes = {"Subject": Subject, "Course": Course, "Student": Student, "Instructor": Instructor}
 
 
@@ -89,6 +90,12 @@ class DBStorage:
                 if (value.id == id):
                     return value
         return None
+        
+    def get_user_email(self, cls, email):
+        inst = self.__session.query(cls).filter(
+            cls.email == email
+        ).first()
+        return inst
     
     # def clear_data(self):
     #     """ Clear all data from the database without dropping the schema """
