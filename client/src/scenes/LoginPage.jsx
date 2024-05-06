@@ -50,7 +50,7 @@ const LoginPage = () => {
     e.preventDefault();
     if (email && password) {
       loginUser(email, password);
-      navigate('/');
+      navigate('/student/me');
     } else {
       setEmailError('Email is required')
       setPasworError('Password is required')
@@ -69,7 +69,7 @@ const LoginPage = () => {
         <div className='my-4'>
           <GoogleLogin onSuccess={responseMessage}  onError={errorMessage} />
         </div>
-        <div className='flex flex-col'>
+        <div className='flex flex-col mb-8'>
           <input 
             value={email}
             placeholder='Enter your email'
