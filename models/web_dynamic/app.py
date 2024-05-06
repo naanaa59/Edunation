@@ -1,4 +1,6 @@
-from flask import Flask, jsonify, request, render_template
+from flask import abort, Flask, jsonify, request, render_template
+from werkzeug.exceptions import HTTPException, NotFound, Unauthorized
+from encrypte import verify_password
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models.subject import Subject
@@ -8,10 +10,19 @@ from models.student import Student
 from models.base import Base
 from models import storage
 from models.engine.db_storage import BaseDB
+from datetime import datetime, timedelta
+from jose import JWTError, jwt
 from os import getenv
+from flask_cors import CORS
+from dotenv import load_dotenv
+
+SECRET_KEY="e13d15c8879290396492efb62d0a424734fadd0727f19789cf62c206e16c5d2cce065e0f314661d64d083938c1ea7400ac423746e6b57c33ab68a711f1a68d91"
+ALGORITHM = "HS256"
+
+load_dotenv()
 
 app = Flask(__name__)
-
+cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.teardown_appcontext
 def close_db(error):
@@ -24,7 +35,21 @@ def close_db(error):
 def get_subjects():
     subjects = storage.all(Subject).values()
     
-    return render_template("subjects_courses.html", subjects=subjects)
+    return jsonify([subject.to_dict() for subject in subjects])
+
+@app.route('/subjects/<subject_id>/courses', methods=['GET'])
+def get_courses_subject_id(subject_id):
+    subject = storage.get(Subject, subject_id)
+
+    if not subject:
+        abort(404)
+    list_courses = []
+    for course in subject.courses:
+        list_courses.append(course.to_dict())
+
+    return jsonify(list_courses)
+
+    
 
 @app.route('/subjects/<int:subject_id>', methods=['GET'])
 def get_subject(subject_id):
@@ -105,22 +130,49 @@ def delete_instructor(instructor_id):
 @app.route('/students', methods=['GET'])
 def get_students():
     students = storage.all(Student).values()
-    return render_template("students.html", students=students)
+    return jsonify([student.to_dict() for student in students])
 
-@app.route('/students/<int:student_id>', methods=['GET'])
+@app.route('/students/<student_id>', methods=['GET'])
 def get_student(student_id):
     student = storage.get(Student, student_id)
-    if student:
-        return render_template("students.html", student=student)
-    else:
-        return render_template("not_found.html")
+    return jsonify(student.to_dict())
 
-@app.route('/students', methods=['POST'])
+@app.route('/students/register', methods=['POST'])
 def create_student():
     data = request.get_json()
+    print(data)
     new_student = Student(**data)
     new_student.save()
     return jsonify({'message': 'Student created successfully', 'id': new_student.id}), 201
+
+
+def authenticate_user(email, password):
+    user = storage.get_user_email(Student, email)
+    if not user:
+        # Raise a 404 Not Found if user doesn't exist
+        raise NotFound(description="Email does not exist")
+    if not verify_password(password, user.password):
+        # Raise a 401 Unauthorized if password is incorrect
+        raise Unauthorized(description="Incorrect password")
+    return user
+
+@app.route('/students/login', methods=['POST'])
+def login_student():
+    data = request.get_json()  # Get the data from the request
+    email = data.get('email')
+    password = data.get('password')
+    try:
+        # Attempt to authenticate the user
+        user = authenticate_user(email, password)
+        data = {
+            "email": user.email,
+            "exp": datetime.utcnow() + timedelta(minutes=1)
+        }
+        token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+        return jsonify({"access_token": token, "token_type": "Bearer"}), 200
+    except HTTPException as e:
+        # Catch HTTP exceptions and return the appropriate response
+        return jsonify({"error": e.description}), e.code
 
 @app.route('/students/<int:student_id>', methods=['PUT'])
 def update_student(student_id):
@@ -146,7 +198,7 @@ def delete_student(student_id):
 @app.route('/courses', methods=['GET'])
 def get_courses():
     courses = storage.all(Course).values()
-    return render_template("courses.html", courses=courses)
+    return jsonify([course.to_dict() for course in courses])
 
 @app.route('/courses/<int:course_id>', methods=['GET'])
 def get_course(course_id):
