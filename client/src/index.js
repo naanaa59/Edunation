@@ -19,7 +19,7 @@ createRoot(document.getElementById('root')).render(
       <Route exact path="/" element={<HomePage />} />
       <Route exact path="/about" element={<AboutPage/>}/>
       <Route exact path="/courses" element={<CoursesPage/>}/>
-      <Route exact path="/student" element={<StudentPage />} />
+      <Route exact path="/student/me" element={<StudentPage />} />
       <Route exact path="/404" element={<NotFoundPage/>}/>
     </Routes>
   </Router>
