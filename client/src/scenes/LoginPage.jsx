@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
 import { useCookies } from 'react-cookie'
+
 
 
 const LoginPage = () => {
@@ -89,9 +90,18 @@ const LoginPage = () => {
             <label className='errorLabel'>{passwordError}</label>
         </div>
         <br />
-        <div>
-          <input className="bg-indigo-600" type="button" onClick={onButtonClick} value={'Log in'} />
+        <div className='w-full flex justify-center'>
+          <input className="bg-indigo-600 w-1/2" type="button" onClick={onButtonClick} value={'Log in'} />
         </div>
+        <div className='flex gap-2 text-sm'>
+          <p className='text-gray-400'>Don't have an account?</p>
+          <Link to="/register">
+            <span className='text-indigo-600 hover:underline cursor-pointer'>
+              Sign up
+            </span>
+          </Link>
+        </div>
+        
     </div>
     </div>
     
