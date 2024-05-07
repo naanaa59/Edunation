@@ -1,6 +1,6 @@
 import React from 'react'
 
-const InstructorPage = () => {
+const ProfilePage = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const InstructorPage = () => {
   )
 }
 
-export default InstructorPage
+export default ProfilePage

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const InstructorPage = () => {
+const SubjectPage = () => {
   return (
     <div>
       
@@ -8,4 +8,5 @@ const InstructorPage = () => {
   )
 }
 
-export default InstructorPage
+export default SubjectPage
+
