@@ -77,7 +77,7 @@ const RegisterPage = () => {
           <GoogleLogin onSuccess={responseMessage}  onError={errorMessage} />
         </div>
         <br/>
-        <div className='flex gap-4'>
+        <div className='flex gap-4 mb-8'>
             <div className='flex flex-col'>
             <input 
                 value={name}
@@ -98,7 +98,7 @@ const RegisterPage = () => {
                 <label className='errorLabel'>{nameError}</label>
             </div>
         </div>
-        <div className='flex flex-col'>
+        <div className='flex flex-col mb-8'>
           <input 
             value={email}
             placeholder='Enter your email'
@@ -108,7 +108,7 @@ const RegisterPage = () => {
             <label className='errorLabel'>{emailError}</label>
         </div>
         <br />
-        <div className='flex flex-col'>
+        <div className='flex flex-col '>
         <input 
             value={password}
             placeholder='Enter your password'
