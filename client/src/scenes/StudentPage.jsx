@@ -80,7 +80,8 @@ import {
 } from "@material-tailwind/react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
- 
+import { Navigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom'
  
 const TABLE_HEAD = ["Course", "Subject", "Instructor", "Unenroll"];
  
@@ -103,6 +104,31 @@ const StudentPage = () =>  {
 //      })
 //      .catch(error => console.error('Error:', error));
 //  }, []);
+const navigate = useNavigate();
+const token = localStorage.getItem("access_token")
+if (!token) {
+  navigate('/login')
+} else {
+  fetch('http://0.0.0.0:5003/token_check/',
+    {
+      method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        }
+    }
+  )
+  .then(data => {
+    console.log(data.status) // 200
+    if (data.status === 401) {
+        window.location.href = '/login';
+    } else {
+      console.log(data)
+    }
+   
+})
+  }
+
+
 const [courses, setCourses] = useState([]);
   useEffect(() => {
     fetch('http://0.0.0.0:5003/courses')

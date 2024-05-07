@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 SECRET_KEY="e13d15c8879290396492efb62d0a424734fadd0727f19789cf62c206e16c5d2cce065e0f314661d64d083938c1ea7400ac423746e6b57c33ab68a711f1a68d91"
 ALGORITHM = "HS256"
 
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -165,9 +166,10 @@ def login_student():
         # Attempt to authenticate the user
         user = authenticate_user(email, password)
         data = {
-            "email": user.email,
+            "sub": user.email,
             "exp": datetime.utcnow() + timedelta(minutes=1)
         }
+        print(data["exp"])
         token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
         return jsonify({"access_token": token, "token_type": "Bearer"}), 200
     except HTTPException as e:
@@ -275,6 +277,33 @@ def unenroll_student(course_id, student_id):
     course.save()
     return jsonify({'message': 'Student unenrolled successfully'}), 200
 
+#decoder
+
+def check_token(authorization: str = None):
+    if not authorization or not authorization.startswith("Bearer "):
+        abort(400, description="Authorization header missing or invalid")
+    try:
+        token = authorization[7:]
+        print(token)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print(payload)
+        email = payload.get("sub")
+    except jwt.JWTError as e:
+
+        print("Exception: ", e)
+        abort(401, description="Invalid token")
+
+    # Assuming you have a function to get the user by email
+    user = storage.get_user_email(Student, email)
+    return user.to_dict()
+
+@app.route('/token_check/', methods=['GET'])
+def client_login():
+    authorization = request.headers.get('Authorization')
+    print(authorization)
+    user = check_token(authorization)
+    print(user)
+    return jsonify({"user": user})
 
 
 if __name__ == '__main__':
