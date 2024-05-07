@@ -3,8 +3,27 @@ import {BsLinkedin} from 'react-icons/bs'
 import {FaGithub} from 'react-icons/fa'
 import { FaTwitter } from "react-icons/fa";
 import logo from '../images/logo.png'
+import { useEffect, useState } from 'react'
 
 const Footer = () => {
+  const [subjects, setSubjects] = useState([]);
+  useEffect(() => {
+    fetch('http://0.0.0.0:5003/subjects')
+       .then(response => response.json())
+       .then(async (subjectsData) => {
+         console.log('Fetched subjects:', subjectsData);
+   
+         // Fetch courses for each subject
+         const subjectsWithCourses = await Promise.all(subjectsData.map(async (subject) => {
+           const response = await fetch(`http://0.0.0.0:5003/subjects/${subject.id}/courses`);
+           const courses = await response.json();
+           return { ...subject, courses }; // Return a new object with courses added
+         }));
+   
+         setSubjects(subjectsWithCourses);
+       })
+       .catch(error => console.error('Error:', error));
+   }, []);
   return (
     <footer className='footer-bg mb-0 h-auto'>
       <div className=' flex flex-col lg:flex-row justify-center gap-24 py-20'>
@@ -21,48 +40,19 @@ const Footer = () => {
 
             {/* { SUBJECT1 } */}
             <li className='relative group'>
-              <div className='flex flex-row'>
-                <span className="inline-block cursor-pointer hover:underline hover:duration-600">Subject1</span>
-                <svg className="h-5 w-5 text-gray-500 group-hover:text-gray-700" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" d="M6 8a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm0 4a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                </svg>
-                <ul className="absolute hidden left-20 top-1 bg-white border border-gray-200 py-2 px-4 rounded-md shadow-lg z-10 group-hover:block text-black">
-                  <li className=''>Course 1</li>
-                  <li>Course 2</li>
-                  <li>Course 3</li>
+            {subjects.map((subject, index) => (
+            <div key={index}>
+                <p className='font-semibold mr-4 cursor-pointer hover:underline hover:duration-600'>{subject.name}</p>
+                <ul>
+                  {subject.courses.map((course, courseIndex) => (
+                    <li key={courseIndex} className='pl-2'>
+                      {course.title}
+                    </li>
+                        ))}
                 </ul>
-              </div>
-            </li>
-
-            {/* { SUBJECT2 } */}
-            <li className='relative group'>
-              <div className='flex flex-row'>
-                <span className="inline-block cursor-pointer hover:underline hover:duration-600">Subject2</span>
-                <svg className="h-5 w-5 text-gray-500 group-hover:text-gray-700" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" d="M6 8a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm0 4a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                </svg>
-                <ul className="absolute hidden left-20 top-1 bg-white border border-gray-200 py-2 px-4 rounded-md shadow-lg z-10 group-hover:block text-black">
-                  <li className=''>Course 1</li>
-                  <li>Course 2</li>
-                  <li>Course 3</li>
-                </ul>
-              </div>
-            </li>
-
-            {/* { SUBJECT3 } */}
-            <li className='relative group'>
-              <div className='flex flex-row'>
-                <span className="inline-block cursor-pointer hover:underline hover:duration-600">Subject3</span>
-                <svg className="h-5 w-5 text-gray-500 group-hover:text-gray-700" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                  <path fillRule="evenodd" d="M6 8a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm0 4a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
-                </svg>
-                <ul className="absolute hidden left-20 top-1 bg-white border border-gray-200 py-2 px-4 rounded-md shadow-lg z-10 group-hover:block text-black">
-                  <li className=''>Course 1</li>
-                  <li>Course 2</li>
-                  <li>Course 3</li>
-                </ul>
-              </div>
-            </li>
+            </div>
+      ))}
+            </li> 
           </ul>
         </div>
         <div className='text-white gothic flex flex-col  lg:w-3/12'>

@@ -37,7 +37,7 @@ const LoginPage = () => {
       });
       if (response.ok) {
         const result = await response.json();
-        console.log(result)
+        // console.log(result)
         const token = localStorage.setItem('access_token', result.access_token);
 
       }
