@@ -19,13 +19,16 @@ const TABLE_HEAD = ["Course", "Subject", "Instructor", "Unenroll"];
 const StudentPage = () =>  {
 
 const navigate = useNavigate();
+const [userInfo, setUserInfo] = useState();
+const [userCourses, setUserCourses] = useState([]);
+const [isLoading, setIsLoading] = useState(true);
 
-const token = localStorage.getItem("access_token")
+
 useEffect(() => {
-    async function check_token(token) {
-    if (!token) {
-      navigate('/login')
-    } else {
+    const check_token = async () => {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const token =  localStorage.getItem("access_token")
+     if (token) {
       const result = await fetch('http://0.0.0.0:5003/token_check/',
         {
           method: 'GET',
@@ -34,31 +37,48 @@ useEffect(() => {
             }
         }
       )
+      const coursesResponse = await fetch('http://0.0.0.0:5003/user/me/courses/',
+        {
+          method: 'GET',
+          headers: {
+            'Authorization':`Bearer ${token}`,
+          
+          },
+        });
       if (result.ok) {
         console.log("ok")
+        console.log("result:", result);
+        console.log("CoursesResponse:", coursesResponse)
+        const userInfo = await result.json();
+        setUserInfo(userInfo.user);
+        const courses = await coursesResponse.json();
+        console.log("Student_Courses:",courses)
+        setUserCourses(courses.courses);
+        
+        setIsLoading(false);
+        // console.log("User Information:", userInfo.user);
         
       } else {
         navigate('/login')
         console.log("Test")
       }
-      console.log(result)
+       console.log(result)
        
     }
       }
-check_token(token);  
-}, [navigate, token]) 
+check_token();  
+}, [navigate]) 
 
-
-const [courses, setCourses] = useState([]);
-  useEffect(() => {
-    fetch('http://0.0.0.0:5003/courses')
-       .then(response => response.json())
-       .then(coursesData => {
-         console.log('Fetched Courses:', coursesData);
-         setCourses(coursesData);
-       })
-       .catch(error => console.error('Error:', error));
-   }, []);
+// const [courses, setCourses] = useState([]);
+//   useEffect(() => {
+//     fetch('http://0.0.0.0:5003/courses')
+//        .then(response => response.json())
+//        .then(coursesData => {
+//          console.log('Fetched Courses:', coursesData);
+//          setCourses(coursesData);
+//        })
+//        .catch(error => console.error('Error:', error));
+//    }, []);
   return (
     <div>
     <Navbar />
@@ -66,9 +86,10 @@ const [courses, setCourses] = useState([]);
       <CardHeader floated={false} shadow={false} className="rounded-none">
         <div className="mb-8 flex items-center justify-between gap-8">
           <div>
-            <Typography variant="h5" color="blue-gray">
-              Welcome back Badr Annabi
-            </Typography>
+          <Typography variant="h5" color="blue-gray">
+          {userInfo ? `Welcome back ${userInfo.first_name} ${userInfo.last_name}` : 'Loading...'}
+          </Typography>
+
             <Typography color="gray" className="mt-1 font-normal">
               Here, you can see all your courses 
             </Typography>
@@ -105,7 +126,7 @@ const [courses, setCourses] = useState([]);
             </tr>
           </thead>
           <tbody>
-            {courses.map((course, index) =>
+            {userCourses && userCourses.length ? userCourses.map((course, index) =>
               (
                   <tr key={index}>
                     <td>
@@ -116,7 +137,7 @@ const [courses, setCourses] = useState([]);
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {course.name}
+                            {course.title}
                           </Typography>
                           <Typography
                             variant="small"
@@ -160,7 +181,11 @@ const [courses, setCourses] = useState([]);
                       </Tooltip>
                     </td>
                   </tr>
-                ))}
+                )) : (
+                  <tr>
+                    <td colSpan={4}>You still didn't enroll in a course...</td>
+                  </tr>
+                )}
           </tbody>
         </table>
       </CardBody>

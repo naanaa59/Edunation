@@ -167,7 +167,7 @@ def login_student():
         user = authenticate_user(email, password)
         data = {
             "sub": user.email,
-            "exp": datetime.utcnow() + timedelta(minutes=1)
+            "exp": datetime.utcnow() + timedelta(minutes=60)
         }
         print(data["exp"])
         token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
@@ -194,6 +194,15 @@ def delete_student(student_id):
         return render_template("not_found.html")
     student.delete()
     return jsonify({'message': 'Student deleted successfully'}), 200
+
+# >------ Student's Courses ---------<
+@app.route('/user/me/courses/', methods=['GET'])
+def get_user_courses():
+    authorization = request.headers.get('Authorization')
+    user = check_token(authorization)
+    student = storage.get(Student, user["id"])
+    all_courses = [course.to_dict() for course in student.student_courses]
+    return jsonify({"courses": all_courses})
 
 
 # CRUD operations for Course
