@@ -26,4 +26,4 @@ def check_token(authorization: str = None):
 def client_login():
     authorization = request.headers.get('Authorization')
     user = check_token(authorization)
-    return jsonify({"user": user})
+    return jsonify({"user": user.to_dict()})

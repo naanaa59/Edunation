@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
@@ -40,6 +40,7 @@ const LoginPage = () => {
         const result = await response.json();
         // console.log(result)
         const token = localStorage.setItem('access_token', result.access_token);
+        // navigate('/student/me');
 
       }
     } catch (error) {
