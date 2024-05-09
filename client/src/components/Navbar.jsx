@@ -32,7 +32,7 @@ useEffect(() => {
 
 
   return (
-    <nav className=" bg-white w-full fixed z-10 shadow-2xl">
+    <nav className=" bg-white w-full fixed flex flex-row items-center z-10 shadow-2xl">
       <div className="container  flex items-center gap-10">
         <img src={logo} alt="EduNation" className="w-14 h-14" />
         <Link to="/" className="text-lg text-black font-semibold mr-4">EduNation</Link>
@@ -84,7 +84,15 @@ useEffect(() => {
             {/* Submit Button */}
             <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
           </form>
-        </div>
+        </div> 
+    </div>
+    <div className='mx-12 flex'>
+      <a href="/login" class="rounded-md px-2 py-2 m-1 overflow-hidden relative group cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600 hover:text-white hover:bg-indigo-600">
+        Login
+      </a>
+      <a href="/register" class="rounded-md px-2 py-2 m-1 overflow-hidden relative group cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600 hover:text-white hover:bg-indigo-600">
+        Register                 
+      </a>              
     </div>
 </nav>
 
