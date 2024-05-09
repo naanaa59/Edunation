@@ -37,7 +37,7 @@ useEffect(() => {
             }
         }
       )
-      const coursesResponse = await fetch('http://0.0.0.0:5003/user/me/courses/',
+      const courseResponse = await fetch('http://0.0.0.0:5003/user/me/courses/',
         {
           method: 'GET',
           headers: {
@@ -48,10 +48,10 @@ useEffect(() => {
       if (result.ok) {
         console.log("ok")
         console.log("result:", result);
-        console.log("CoursesResponse:", coursesResponse)
+        console.log("CoursesResponse:", courseResponse)
         const userInfo = await result.json();
         setUserInfo(userInfo.user);
-        const courses = await coursesResponse.json();
+        const courses = await courseResponse.json();
         console.log("Student_Courses:",courses)
         setUserCourses(courses.courses);
         

@@ -211,13 +211,13 @@ def get_courses():
     courses = storage.all(Course).values()
     return jsonify([course.to_dict() for course in courses])
 
-@app.route('/courses/<int:course_id>', methods=['GET'])
+@app.route('/courses/<course_id>', methods=['GET'])
 def get_course(course_id):
     course = storage.get(Course, course_id)
     if course:
-        return render_template("courses.html", course=course)
+        return jsonify(course.to_dict())
     else:
-        return render_template("not_found.html")
+        return
 
 @app.route('/courses', methods=['POST'])
 def create_course():

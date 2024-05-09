@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import '../styles/styles.css'
 import logo from '../images/logo.png'
 import arrow from '../images/arrow.png'
+import { Link } from 'react-router-dom'
 
 const Navbar = () => {
   const [subjects, setSubjects] = useState([]);
@@ -34,7 +35,7 @@ useEffect(() => {
     <nav className=" bg-white w-full fixed z-10 shadow-2xl">
       <div className="container  flex items-center gap-10">
         <img src={logo} alt="EduNation" className="w-14 h-14" />
-        <div className="text-lg text-black font-semibold mr-4">EduNation</div>
+        <Link to="/" className="text-lg text-black font-semibold mr-4">EduNation</Link>
         
         <Popover>
           <PopoverHandler>
@@ -55,9 +56,12 @@ useEffect(() => {
                 <p className='font-semibold mr-4 cursor-pointer hover:underline hover:duration-600'>{subject.name}</p>
                 <ul>
                   {subject.courses.map((course, courseIndex) => (
-                    <li key={courseIndex} className='pl-2'>
+                    <Link to={`/courses/${course.id}`}>
+                      <li  key={courseIndex} className='pl-2'>
                       {course.title}
                     </li>
+                    </Link>
+                    
                         ))}
                 </ul>
             </div>
