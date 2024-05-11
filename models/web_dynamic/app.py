@@ -255,7 +255,7 @@ from models.student import Student
 from models.course import Course
 
 # Enroll a student in a course
-@app.route('/courses/<int:course_id>/enroll/<int:student_id>', methods=['POST'])
+@app.route('/courses/<course_id>/enroll/<student_id>', methods=['POST'])
 def enroll_student(course_id, student_id):
     course = storage.get(Course, course_id)
     student = storage.get(Student, student_id)
