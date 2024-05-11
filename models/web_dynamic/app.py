@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from models.subject import Subject
 from models.course import Course
 from models.instructor import Instructor
-from models.student import Student
+from models.student import Student, StudentCourses
 from models.base import Base
 from models import storage
 from models.engine.db_storage import BaseDB
@@ -266,8 +266,15 @@ def enroll_student(course_id, student_id):
     if student in course.students:
         return jsonify({'error': 'Student already enrolled in the course'}), 400
 
-    course.students.append(student)
-    course.save()
+    # course.students.append(student)
+    # course.save()
+    enrollment = StudentCourses(student_id=student.id, course_id=course.id)
+    storage.new(enrollment)
+    storage.save()
+    course.student_courses.append(enrollment)
+    student.student_courses.append(enrollment)
+    storage.save()
+        
     return jsonify({'message': 'Student enrolled successfully'}), 200
 
 # Unenroll a student from a course
