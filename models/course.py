@@ -14,9 +14,9 @@ class Course(Base, BaseDB):
     __mapper_args__ = {
         'confirm_deleted_rows': False
     }
-    subject_id = Column(String(60), ForeignKey('subjects.id'), nullable=True)
+    subject_id = Column(String(60), ForeignKey('subjects.id'), nullable=False)
     # student_id = Column(String(60), ForeignKey('students.id', ondelete='SET NULL'), nullable=True)
-    instructor_id = Column(String(60), ForeignKey('instructors.id'), nullable=True)
+    instructor_id = Column(String(60), ForeignKey('instructors.id'), nullable=False)
 
     title = Column(String(128), nullable=True)
     # link_video = Column(String(1000), nullable=True)
@@ -30,6 +30,8 @@ class Course(Base, BaseDB):
 
     instructor_courses = relationship("InstructorCourses", back_populates="courses",
                                       cascade="all, delete")
+    
+
 
     def __init__(self, *args, **kwargs):
         """ initializes course """
