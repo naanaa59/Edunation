@@ -108,6 +108,7 @@ class DBStorage:
         return self.__session.query(StudentCourses).filter_by(
             student_id=student_id, course_id=course_id).first()
     
+    
     # def clear_data(self):
     #     """ Clear all data from the database without dropping the schema """
     #     self.__session.rollback() # Rollback the nested transaction
