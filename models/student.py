@@ -31,7 +31,15 @@ class StudentCourses(BaseDB):
     students = relationship("Student", back_populates="student_courses")
     courses = relationship("Course", back_populates="student_courses")
 
-
+    def to_dict(self):
+        """ Convert StudentCourses object to dictionary """
+        enrollment_dict = {
+            'student_id': self.student_id,
+            'course_id': self.course_id,
+            'student': self.students.to_dict(),
+            'course': self.courses.to_dict()
+        }
+        return enrollment_dict
 
 class Student(User, BaseDB):
     """ Subject Class definition """

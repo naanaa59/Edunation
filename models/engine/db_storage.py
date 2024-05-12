@@ -15,7 +15,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from dotenv import load_dotenv
 
 load_dotenv()
-classes = {"Subject": Subject, "Course": Course, "Student": Student, "Instructor": Instructor}
+classes = {"Subject": Subject, "Course": Course, "Student": Student, "Instructor": Instructor, "StudentCourses": StudentCourses}
 
 
 class DBStorage:
@@ -108,6 +108,9 @@ class DBStorage:
         return self.__session.query(StudentCourses).filter_by(
             student_id=student_id, course_id=course_id).first()
     
+    def list_enrollements(self):
+        """ Get all enrollements"""
+        return self.__session.query(StudentCourses).all()
     
     # def clear_data(self):
     #     """ Clear all data from the database without dropping the schema """
