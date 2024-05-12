@@ -293,6 +293,13 @@ def unenroll_student(course_id, student_id):
         
     return jsonify({'message': 'Student unenrolled successfully'}), 200
     
+# List all enrollement
+@app.route('/courses/all-enrollement', methods=['GET'])
+def list_all_enrollement():
+    enrollements = storage.list_enrollements()
+    enrollements_list = [enrollement.to_dict() for enrollement in enrollements]
+    return jsonify(enrollements_list), 200
+
 
 #decoder
 
