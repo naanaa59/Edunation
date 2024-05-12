@@ -31,34 +31,19 @@ def close_db(error):
     storage.close()
 
 
-# CRUD operations for Subject
+# CRUD operations for Subject OK
 @app.route('/subjects', methods=['GET'])
 def get_subjects():
     subjects = storage.all(Subject).values()
-    
     return jsonify([subject.to_dict() for subject in subjects])
 
-@app.route('/subjects/<subject_id>/courses', methods=['GET'])
-def get_courses_subject_id(subject_id):
-    subject = storage.get(Subject, subject_id)
-
-    if not subject:
-        abort(404)
-    list_courses = []
-    for course in subject.courses:
-        list_courses.append(course.to_dict())
-
-    return jsonify(list_courses)
-
-    
-
-@app.route('/subjects/<int:subject_id>', methods=['GET'])
+@app.route('/subjects/<subject_id>', methods=['GET'])
 def get_subject(subject_id):
     subject = storage.get(Subject, subject_id)
     if subject:
-        return render_template("subjects_courses.html", subject=subject)
+        return jsonify(subject.to_dict())
     else:
-        return render_template("not_found.html")
+        return jsonify({'message': 'Subject not found'}), 404
 
 @app.route('/subjects', methods=['POST'])
 def create_subject():
@@ -67,38 +52,40 @@ def create_subject():
     new_subject.save()
     return jsonify({'message': 'Subject created successfully', 'id': new_subject.id}), 201
 
-@app.route('/subjects/<int:subject_id>', methods=['PUT'])
+@app.route('/subjects/<subject_id>', methods=['PUT'])
 def update_subject(subject_id):
     subject = storage.get(Subject, subject_id)
     if not subject:
-        return render_template("not_found.html")
+        return jsonify({'message': 'subject not found'}), 404
     data = request.get_json()
     for key, value in data.items():
         setattr(subject, key, value)
+    subject.save()
     return jsonify({'message': 'Subject updated successfully'}), 200
 
-@app.route('/subjects/<int:subject_id>', methods=['DELETE'])
+@app.route('/subjects/<subject_id>', methods=['DELETE'])
 def delete_subject(subject_id):
     subject = storage.get(Subject, subject_id)
     if not subject:
-        return render_template("not_found.html")
+        return jsonify({'message': 'subject not found'}), 404
     subject.delete()
+    storage.save()
     return jsonify({'message': 'Subject deleted successfully'}), 200
 
 
-# CRUD operations for Instructor
+# CRUD operations for Instructor OK
 @app.route('/instructors', methods=['GET'])
 def get_instructors():
     instructors = storage.all(Instructor).values()
-    return render_template("instructors.html", instructors=instructors)
+    return jsonify([instructor.to_dict() for instructor in instructors])
 
-@app.route('/instructors/<int:instructor_id>', methods=['GET'])
+@app.route('/instructors/<instructor_id>', methods=['GET'])
 def get_instructor(instructor_id):
     instructor = storage.get(Instructor, instructor_id)
-    if instructor:
-        return render_template("instructors.html", instructor=instructor)
+    if not instructor:
+        return jsonify({'message': 'Instructor not found'}), 404
     else:
-        return render_template("not_found.html")
+        return jsonify(instructor.to_dict())
 
 @app.route('/instructors', methods=['POST'])
 def create_instructor():
@@ -107,27 +94,28 @@ def create_instructor():
     new_instructor.save()
     return jsonify({'message': 'Instructor created successfully', 'id': new_instructor.id}), 201
 
-@app.route('/instructors/<int:instructor_id>', methods=['PUT'])
+@app.route('/instructors/<instructor_id>', methods=['PUT'])
 def update_instructor(instructor_id):
     instructor = storage.get(Instructor, instructor_id)
     if not instructor:
-        return render_template("not_found.html")
+        return jsonify({'message': 'Instructor not found'}), 404
     data = request.get_json()
     for key, value in data.items():
         setattr(instructor, key, value)
     instructor.save()
     return jsonify({'message': 'Instructor updated successfully'}), 200
 
-@app.route('/instructors/<int:instructor_id>', methods=['DELETE'])
+@app.route('/instructors/<instructor_id>', methods=['DELETE'])
 def delete_instructor(instructor_id):
     instructor = storage.get(Instructor, instructor_id)
     if not instructor:
-        return render_template("not_found.html")
+        return jsonify({'message': 'Instructor not found'}), 404
     instructor.delete()
+    storage.save()
     return jsonify({'message': 'Instructor deleted successfully'}), 200
 
 
-# CRUD operations for Student
+# CRUD operations for Student OK
 @app.route('/students', methods=['GET'])
 def get_students():
     students = storage.all(Student).values()
@@ -176,7 +164,7 @@ def login_student():
         # Catch HTTP exceptions and return the appropriate response
         return jsonify({"error": e.description}), e.code
 
-@app.route('/students/<int:student_id>', methods=['PUT'])
+@app.route('/students/<student_id>', methods=['PUT'])
 def update_student(student_id):
     student = storage.get(Student, student_id)
     if not student:
@@ -187,25 +175,16 @@ def update_student(student_id):
     student.save()
     return jsonify({'message': 'Student updated successfully'}), 200
 
-@app.route('/students/<int:student_id>', methods=['DELETE'])
+@app.route('/students/<student_id>', methods=['DELETE'])
 def delete_student(student_id):
     student = storage.get(Student, student_id)
     if not student:
         return render_template("not_found.html")
     student.delete()
+    storage.save()
     return jsonify({'message': 'Student deleted successfully'}), 200
 
-# >------ Student's Courses ---------<
-@app.route('/user/me/courses/', methods=['GET'])
-def get_user_courses():
-    authorization = request.headers.get('Authorization')
-    user = check_token(authorization)
-    student = storage.get(Student, user["id"])
-    all_courses = [course.to_dict() for course in student.student_courses]
-    return jsonify({"courses": all_courses})
-
-
-# CRUD operations for Course
+# CRUD operations for Course OK
 @app.route('/courses', methods=['GET'])
 def get_courses():
     courses = storage.all(Course).values()
@@ -217,7 +196,7 @@ def get_course(course_id):
     if course:
         return jsonify(course.to_dict())
     else:
-        return
+        return jsonify({'message': 'Course not found'}), 404
 
 @app.route('/courses', methods=['POST'])
 def create_course():
@@ -232,10 +211,8 @@ def create_course():
 def update_course(course_id):
     course = storage.get(Course, course_id)
     if not course:
-        return render_template("not_found.html")
+        return jsonify({"message": "Course not found"}), 404
     data = request.get_json()
-    if 'subject_id' not in data or 'instructor_id' not in data:
-        return jsonify({'error': 'subject_id and instructor_id are required'}), 400
     for key, value in data.items():
         setattr(course, key, value)
     course.save()
@@ -245,16 +222,39 @@ def update_course(course_id):
 def delete_course(course_id):
     course = storage.get(Course, course_id)
     if not course:
-        return render_template("not_found.html")
+        return jsonify({"message": "Course not found"}), 404
     course.delete()
+    storage.save()
     return jsonify({'message': 'Course deleted successfully'}), 200
 
-from flask import jsonify, request, render_template
-from models import storage
-from models.student import Student
-from models.course import Course
+# >---------- RELATIONSHIPS -----------<
 
-# Enroll a student in a course
+# >------ Student's Courses ---------<
+# @app.route('/user/me/courses/', methods=['GET'])
+# def get_user_courses():
+#     authorization = request.headers.get('Authorization')
+#     user = check_token(authorization)
+#     student = storage.get(Student, user["id"])
+#     all_courses = courses = [enrollment.courses.to_dict() for enrollment in student.student_courses]
+#     return jsonify({"courses": all_courses})
+
+# This method was for testing without authorization It WORKS :D
+@app.route('/students/<student_id>/courses/', methods=['GET'])
+def get_user_courses(student_id):
+    student = storage.get(Student, student_id)
+    all_courses =  [enrollment.courses.to_dict() for enrollment in student.student_courses]
+    return jsonify({"courses": all_courses})
+
+# Get all courses of a subject OK
+@app.route('/subjects/<subject_id>/courses', methods=['GET'])
+def get_courses_subject_id(subject_id):
+    subject = storage.get(Subject, subject_id)
+    if not subject:
+        return jsonify({'message': 'subject not found'}), 404
+    list_courses = subject.courses
+    return jsonify([course.to_dict() for course in list_courses])
+
+# Enroll a student in a course OK
 @app.route('/courses/<course_id>/enroll/<student_id>', methods=['POST'])
 def enroll_student(course_id, student_id):
     course = storage.get(Course, course_id)
@@ -266,18 +266,12 @@ def enroll_student(course_id, student_id):
     # Check if the student is already enrolled in the course
     if storage.is_student_enrolled(student_id, course_id):
         return jsonify({'error': 'Student already enrolled in the course'}), 400
-
-    
-
-    # course.students.append(student)
-    # course.save()
     enrollment = StudentCourses(student_id=student.id, course_id=course.id)
     storage.new(enrollment)
-    # storage.save()
-    # course.student_courses.append(enrollment)
-    # student.student_courses.append(enrollment)
     storage.save()
-        
+    course.student_courses.append(enrollment)
+    student.student_courses.append(enrollment)
+    storage.save()
     return jsonify({'message': 'Student enrolled successfully'}), 200
 
 # Unenroll a student from a course
