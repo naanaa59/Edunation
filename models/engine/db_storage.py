@@ -6,7 +6,7 @@ import sqlalchemy
 from models.user import User
 from models.subject import Subject
 from models.course import Course
-from models.student import Student
+from models.student import Student, StudentCourses
 from models.instructor import Instructor
 from sqlalchemy import create_engine
 from models.base import Base, BaseDB
@@ -96,6 +96,17 @@ class DBStorage:
             cls.email == email
         ).first()
         return inst
+    
+    def is_student_enrolled(self, student_id, course_id):
+        """ Check if the student is already enrolled in the course """
+        existing_enrollment = self.__session.query(StudentCourses).filter_by(
+            student_id=student_id, course_id=course_id).first()
+        return existing_enrollment is not None
+    
+    def get_enrollment(self, student_id, course_id):
+        """ Get the enrollment object for a student in a course """
+        return self.__session.query(StudentCourses).filter_by(
+            student_id=student_id, course_id=course_id).first()
     
     # def clear_data(self):
     #     """ Clear all data from the database without dropping the schema """

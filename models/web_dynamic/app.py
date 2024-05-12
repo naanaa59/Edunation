@@ -228,7 +228,7 @@ def create_course():
     new_course.save()
     return jsonify({'message': 'Course created successfully', 'id': new_course.id}), 201
 
-@app.route('/courses/<int:course_id>', methods=['PUT'])
+@app.route('/courses/<course_id>', methods=['PUT'])
 def update_course(course_id):
     course = storage.get(Course, course_id)
     if not course:
@@ -241,7 +241,7 @@ def update_course(course_id):
     course.save()
     return jsonify({'message': 'Course updated successfully'}), 200
 
-@app.route('/courses/<int:course_id>', methods=['DELETE'])
+@app.route('/courses/<course_id>', methods=['DELETE'])
 def delete_course(course_id):
     course = storage.get(Course, course_id)
     if not course:
@@ -263,22 +263,25 @@ def enroll_student(course_id, student_id):
     if not course or not student:
         return jsonify({'error': 'Course or student not found'}), 404
 
-    if student in course.students:
+    # Check if the student is already enrolled in the course
+    if storage.is_student_enrolled(student_id, course_id):
         return jsonify({'error': 'Student already enrolled in the course'}), 400
+
+    
 
     # course.students.append(student)
     # course.save()
     enrollment = StudentCourses(student_id=student.id, course_id=course.id)
     storage.new(enrollment)
-    storage.save()
-    course.student_courses.append(enrollment)
-    student.student_courses.append(enrollment)
+    # storage.save()
+    # course.student_courses.append(enrollment)
+    # student.student_courses.append(enrollment)
     storage.save()
         
     return jsonify({'message': 'Student enrolled successfully'}), 200
 
 # Unenroll a student from a course
-@app.route('/courses/<int:course_id>/unenroll/<int:student_id>', methods=['POST'])
+@app.route('/courses/<course_id>/unenroll/<student_id>', methods=['POST'])
 def unenroll_student(course_id, student_id):
     course = storage.get(Course, course_id)
     student = storage.get(Student, student_id)
@@ -286,12 +289,16 @@ def unenroll_student(course_id, student_id):
     if not course or not student:
         return jsonify({'error': 'Course or student not found'}), 404
 
-    if student not in course.students:
+    # Check if the student is already enrolled in the course
+    if not storage.is_student_enrolled(student_id, course_id):
         return jsonify({'error': 'Student is not enrolled in the course'}), 400
 
-    course.students.remove(student)
-    course.save()
+    enrollment = storage.get_enrollment(student_id=student.id, course_id=course.id)
+    storage.delete(enrollment)
+    storage.save()
+        
     return jsonify({'message': 'Student unenrolled successfully'}), 200
+    
 
 #decoder
 
