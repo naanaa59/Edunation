@@ -1,18 +1,29 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Popover,
   PopoverHandler,
   PopoverContent,
 } from "@material-tailwind/react"
-import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import '../styles/styles.css'
 import logo from '../images/logo.png'
 import arrow from '../images/arrow.png'
-import { Link } from 'react-router-dom'
+import { RxAvatar } from "react-icons/rx";
 
 const Navbar = () => {
   const [subjects, setSubjects] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
 useEffect(() => {
+  const check_token = async () => {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const token =  localStorage.getItem("access_token")
+   if (token) {
+    setIsLoggedIn(true);
+   }
+  };
+  check_token();
+
   fetch('http://0.0.0.0:5003/subjects')
      .then(response => response.json())
      .then(async (subjectsData) => {
@@ -86,13 +97,22 @@ useEffect(() => {
           </form>
         </div> 
     </div>
+    {/* Checking if the user has been logged or not */}
     <div className='m-auto mr-16 flex '>
-      <a href="/login" class="rounded-sm px-2 py-2 m-1 overflow-hidden  cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600 transition-colors duration-300 ease-in-out delay-150 hover:text-white hover:bg-indigo-600 hover:rounded-xl">
-        Login
-      </a>
-      <a href="/register" class="rounded-sm px-2 py-2 m-1 overflow-hidden  cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600 hover:text-white hover:bg-indigo-600 transition duration-300 ease-in-out delay-150 hover:rounded-xl">
-        Register                 
-      </a>              
+    {isLoggedIn ? (
+      
+      <RxAvatar />
+      
+    ) : (
+      <>
+        <a href="/login" class="rounded-sm px-2 py-2 m-1 overflow-hidden  cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600 transition-colors duration-300 ease-in-out delay-150 hover:text-white hover:bg-indigo-600 hover:rounded-xl">
+          Login
+        </a>
+        <a href="/register" class="rounded-sm px-2 py-2 m-1 overflow-hidden  cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600 hover:text-white hover:bg-indigo-600 transition duration-300 ease-in-out delay-150 hover:rounded-xl">
+          Register                 
+        </a>              
+      </>
+    )}
     </div>
 </nav>
 

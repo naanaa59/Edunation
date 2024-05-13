@@ -207,9 +207,9 @@ def create_course(subject_id, instructor_id):
     subject_ins= storage.get(Subject, data["subject_id"])
     instructor = storage.get(Instructor, data["instructor_id"])
     if subject_ins is None:
-        return jsonify({'error': "subject not found in dababase"})
+        return jsonify({'error': "subject not found in database"})
     if instructor is None:
-        return jsonify({'error': "instructor not found in dababase"})
+        return jsonify({'error': "instructor not found in database"})
     course = Course(**data)
     inst_c_instance = InstructorCourses(instructor_id= instructor.id,
                                         course_id=course.id)
