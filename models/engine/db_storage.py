@@ -15,7 +15,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from dotenv import load_dotenv
 
 load_dotenv()
-classes = {"Subject": Subject, "Course": Course, "Student": Student, "Instructor": Instructor, "StudentCourses": StudentCourses}
+classes = {"Subject": Subject, "Course": Course, "Student": Student, "Instructor": Instructor}
 
 
 class DBStorage:
@@ -107,30 +107,3 @@ class DBStorage:
         """ Get the enrollment object for a student in a course """
         return self.__session.query(StudentCourses).filter_by(
             student_id=student_id, course_id=course_id).first()
-    
-    def list_enrollements(self):
-        """ Get all enrollements"""
-        return self.__session.query(StudentCourses).all()
-    
-    # def clear_data(self):
-    #     """ Clear all data from the database without dropping the schema """
-    #     self.__session.rollback() # Rollback the nested transaction
-    #     self.__session.begin_nested() # Start a new nested transaction
-    #     self.close()
-    # def relationship_manager(self, obj):
-    #     """ This function sets relationships in database for created obj"""
-    #     if isinstance(obj, Student):
-    #         for course in obj.courses:
-    #             course.students.append(obj)
-    #     elif isinstance(obj,Instructor):
-    #         for course in obj.courses:
-    #             course.instructors.append(obj)
-    #     elif isinstance(obj, Course):
-    #         for student in obj.students:
-    #             student.courses.append(obj)
-    #         for instructor in obj.instructors:
-    #             instructor.courses.append(obj)
-    #     self.save()
-
-
-

@@ -83,6 +83,7 @@ class EDUCommand(cmd.Cmd):
                                                         course_id=instance.id)
 
                     subject.courses.append(instance)
+                    instance.subject = subject
                     instance.instructor_courses.append(inst_c_instance)      
                     instructor.instructor_courses.append(inst_c_instance)          
             else:    
@@ -215,13 +216,20 @@ enroll <student_id> <course_id>**")
 enroll <student_id> <course_id>**")
             return
         
-        enrollment = StudentCourses(student_id=student.id, course_id=course.id)
-        models.storage.new(enrollment)
-        models.storage.save()
-        course.student_courses.append(enrollment)
-        student.student_courses.append(enrollment)
-        # course.students.append(student)
-        models.storage.save()
+        if not models.storage.is_student_enrolled(student.id, course.id):
+            enrollment = StudentCourses(student_id=student.id, course_id=course.id)
+            models.storage.new(enrollment)
+            models.storage.save()
+            if enrollment not in course.student_courses:
+                course.student_courses.append(enrollment)
+            else:
+                return
+            if enrollment not in student.append(enrollment):
+                student.student_courses.append(enrollment)
+            else:
+                return
+            # course.students.append(student)
+            models.storage.save()
         
 
 if __name__ == '__main__':

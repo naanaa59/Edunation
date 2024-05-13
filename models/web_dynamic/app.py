@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models.subject import Subject
 from models.course import Course
-from models.instructor import Instructor
+from models.instructor import Instructor, InstructorCourses
 from models.student import Student, StudentCourses
 from models.base import Base
 from models import storage
@@ -198,14 +198,29 @@ def get_course(course_id):
     else:
         return jsonify({'message': 'Course not found'}), 404
 
-@app.route('/courses', methods=['POST'])
-def create_course():
+@app.route('/courses/<subject_id>/<instructor_id>', methods=['POST'])
+def create_course(subject_id, instructor_id):
     data = request.get_json()
-    if 'subject_id' not in data or 'instructor_id' not in data:
+    # if 'subject_id' not in data or 'instructor_id' not in data:
+    if not subject_id or not instructor_id:
         return jsonify({'error': 'subject_id and instructor_id are required'}), 400
-    new_course = Course(**data)
-    new_course.save()
-    return jsonify({'message': 'Course created successfully', 'id': new_course.id}), 201
+    subject_ins= storage.get(Subject, data["subject_id"])
+    instructor = storage.get(Instructor, data["instructor_id"])
+    if subject_ins is None:
+        return jsonify({'error': "subject not found in dababase"})
+    if instructor is None:
+        return jsonify({'error': "instructor not found in dababase"})
+    course = Course(**data)
+    inst_c_instance = InstructorCourses(instructor_id= instructor.id,
+                                        course_id=course.id)
+
+    subject_ins.courses.append(course)
+    course.subject = subject_ins
+    course.instructor_courses.append(inst_c_instance)      
+    instructor.instructor_courses.append(inst_c_instance)          
+    course.save()
+
+    return jsonify({'message': 'Course created successfully', 'id': course.id}), 201
 
 @app.route('/courses/<course_id>', methods=['PUT'])
 def update_course(course_id):
@@ -230,17 +245,17 @@ def delete_course(course_id):
 # >---------- RELATIONSHIPS -----------<
 
 # >------ Student's Courses ---------<
-# @app.route('/user/me/courses/', methods=['GET'])
-# def get_user_courses():
-#     authorization = request.headers.get('Authorization')
-#     user = check_token(authorization)
-#     student = storage.get(Student, user["id"])
-#     all_courses = courses = [enrollment.courses.to_dict() for enrollment in student.student_courses]
-#     return jsonify({"courses": all_courses})
+@app.route('/user/me/courses/', methods=['GET'])
+def get_user_courses():
+    authorization = request.headers.get('Authorization')
+    user = check_token(authorization)
+    student = storage.get(Student, user["id"])
+    all_courses = courses = [enrollment.courses.to_dict() for enrollment in student.student_courses]
+    return jsonify({"courses": all_courses})
 
 # This method was for testing without authorization It WORKS :D
 @app.route('/students/<student_id>/courses/', methods=['GET'])
-def get_user_courses(student_id):
+def list_all_student_courses(student_id):
     student = storage.get(Student, student_id)
     all_courses =  [enrollment.courses.to_dict() for enrollment in student.student_courses]
     return jsonify({"courses": all_courses})

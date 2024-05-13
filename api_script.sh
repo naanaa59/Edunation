@@ -14,7 +14,7 @@ echo " Creating models using POST method..."
 subject_id=$(curl -s -X POST -H "Content-Type: application/json" -d '{"name": "New Subject"}' "${BASE_URL}/subjects" | extract_id)
 instructor_id=$(curl -s -X POST -H "Content-Type: application/json" -d '{"first_name": "New Instructor"}' "${BASE_URL}/instructors" | extract_id)
 student_id=$(curl -s -X POST -H "Content-Type: application/json" -d '{"first_name": "New Student"}' "${BASE_URL}/students/register" | extract_id)
-course_id=$(curl -s -X POST -H "Content-Type: application/json" -d '{"title": "New Course", "subject_id": "'"$subject_id"'", "instructor_id": "'"$instructor_id"'"}' "${BASE_URL}/courses" | extract_id)
+course_id=$(curl -s -X POST -H "Content-Type: application/json" -d '{"title": "New Course", "subject_id": "'"$subject_id"'", "instructor_id": "'"$instructor_id"'"}' "${BASE_URL}/courses/${subject_id}/${instructor_id}" | extract_id)
 
 
 # Print the extracted IDs
@@ -50,8 +50,6 @@ echo "------------------------------------------------------"
 echo "----------Testing enrolling-----------------"
 curl -s -X POST ${BASE_URL}/courses/${course_id}/enroll/${student_id}
 
-echo "---------------------------List of enrollements-----------------------"
-curl -s -X GET http://localhost:5003/courses/all-enrollement
 
 read -p "Do you want to unenroll the student? [yes/no]: " confirm_delete
 if [[ "$confirm_delete" == "yes" ]]; then
@@ -67,16 +65,16 @@ read -p "Do you want to delete the resources [yes/no]: " confirm_delete
 # Check user input and execute DELETE requests if user confirms
 if [[ "$confirm_delete" == "yes" ]]; then
     echo "Deleting resources..."
-
+    curl -X DELETE "${BASE_URL}/courses/${course_id}"
+    echo "------------------------------------------------------"
     curl -X DELETE "${BASE_URL}/subjects/${subject_id}"
     echo "------------------------------------------------------"
     curl -X DELETE "${BASE_URL}/instructors/${instructor_id}"
     echo "------------------------------------------------------"
     curl -X DELETE "${BASE_URL}/students/${student_id}"
     echo "----------------------------------------------------"
-    # This course will not be deleted because it got deleted automatically by deleting the subject
-    curl -X DELETE "${BASE_URL}/courses/${course_id}"
-    echo "------------------------------------------------------"
+    
+    
 else
     echo "No resources will be deleted."
 fi
