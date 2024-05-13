@@ -30,8 +30,6 @@ class Course(Base, BaseDB):
 
     instructor_courses = relationship("InstructorCourses", back_populates="courses",
                                       cascade="all, delete")
-    
-
 
     def __init__(self, *args, **kwargs):
         """ initializes course """

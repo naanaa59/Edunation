@@ -230,17 +230,17 @@ def delete_course(course_id):
 # >---------- RELATIONSHIPS -----------<
 
 # >------ Student's Courses ---------<
-# @app.route('/user/me/courses/', methods=['GET'])
-# def get_user_courses():
-#     authorization = request.headers.get('Authorization')
-#     user = check_token(authorization)
-#     student = storage.get(Student, user["id"])
-#     all_courses = courses = [enrollment.courses.to_dict() for enrollment in student.student_courses]
-#     return jsonify({"courses": all_courses})
+@app.route('/user/me/courses/', methods=['GET'])
+def get_user_courses():
+    authorization = request.headers.get('Authorization')
+    user = check_token(authorization)
+    student = storage.get(Student, user["id"])
+    all_courses = courses = [enrollment.courses.to_dict() for enrollment in student.student_courses]
+    return jsonify({"courses": all_courses})
 
 # This method was for testing without authorization It WORKS :D
 @app.route('/students/<student_id>/courses/', methods=['GET'])
-def get_user_courses(student_id):
+def list_all_student_courses(student_id):
     student = storage.get(Student, student_id)
     all_courses =  [enrollment.courses.to_dict() for enrollment in student.student_courses]
     return jsonify({"courses": all_courses})
@@ -259,7 +259,8 @@ def get_courses_subject_id(subject_id):
 def enroll_student(course_id, student_id):
     course = storage.get(Course, course_id)
     student = storage.get(Student, student_id)
-
+    student_course = storage.all(StudentCourses)
+    print("Student_course",student_course)
     if not course or not student:
         return jsonify({'error': 'Course or student not found'}), 404
 
@@ -273,6 +274,13 @@ def enroll_student(course_id, student_id):
     student.student_courses.append(enrollment)
     storage.save()
     return jsonify({'message': 'Student enrolled successfully'}), 200
+
+    # if student in course.student_courses:
+    #     return jsonify({'error': 'Student already enrolled in the course'}), 400
+    # print("Student",student)
+    # course.student_courses = (student.id)
+    # course.save()
+    # return jsonify({'message': 'Student enrolled successfully'}), 200
 
 # Unenroll a student from a course
 @app.route('/courses/<course_id>/unenroll/<student_id>', methods=['POST'])
