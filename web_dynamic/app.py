@@ -15,6 +15,7 @@ from jose import JWTError, jwt
 from os import getenv
 from flask_cors import CORS
 from dotenv import load_dotenv
+from sqlalchemy.exc import IntegrityError
 
 SECRET_KEY="e13d15c8879290396492efb62d0a424734fadd0727f19789cf62c206e16c5d2cce065e0f314661d64d083938c1ea7400ac423746e6b57c33ab68a711f1a68d91"
 ALGORITHM = "HS256"
@@ -279,15 +280,18 @@ def enroll_student(course_id, student_id):
         return jsonify({'error': 'Course or student not found'}), 404
 
     # Check if the student is already enrolled in the course
-    if storage.is_student_enrolled(student_id, course_id):
-        return jsonify({'error': 'Student already enrolled in the course'}), 400
-    enrollment = StudentCourses(student_id=student.id, course_id=course.id)
-    storage.new(enrollment)
-    storage.save()
-    course.student_courses.append(enrollment)
-    student.student_courses.append(enrollment)
-    storage.save()
-    return jsonify({'message': 'Student enrolled successfully'}), 200
+    try:
+        enrollment = StudentCourses(student_id=student.id, course_id=course.id)
+        storage.new(enrollment)
+        storage.save()
+        course.student_courses.append(enrollment)
+        student.student_courses.append(enrollment)
+        storage.save()
+        return jsonify({'message': 'Student enrolled successfully'}), 200
+    except IntegrityError as e:
+        storage.rollback_db()
+        return jsonify({'error': 'Student already enrolled'}), 400
+
 
 # Unenroll a student from a course
 @app.route('/courses/<course_id>/unenroll/<student_id>', methods=['POST'])
