@@ -7,4 +7,5 @@ __pycache__/*
 
 
 client/node_modules/*
+client/node_modules/.*
 
