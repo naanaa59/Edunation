@@ -153,7 +153,62 @@ class TestDBStorage(unittest.TestCase):
         storage.delete(subject)
         storage.delete(instructor)
         storage.delete(course)
-        
+    
+    def test_cascading_deletes(self):
+        """ Test cascading deletes """
+        subject = Subject(name="Test Subject", description="Test description")
+        storage.new(subject)
+        storage.save()
+        subject_id = subject.id
+
+        # Create a course associated with the subject
+        course = Course(subject_id=subject_id, title="Test Course", description="Course description")
+        storage.new(course)
+        storage.save()
+
+        # Verify that subject and course exist
+        self.assertIn(subject, storage.all(Subject).values())
+        self.assertIn(course, storage.all(Course).values())
+
+        # Delete the subject, which should trigger a cascade delete for associated courses
+        storage.delete(subject)
+        storage.save()
+
+        # Verify that subject and associated course are deleted
+        self.assertNotIn(subject, storage.all(Subject).values())
+        self.assertNotIn(course, storage.all(Course).values())
+    
+    def test_cascading_deletes_course(self):
+        """ Test cascading deletes course"""
+        subject = Subject(name="Test Subject", description="Test description")
+        instructor = Instructor(username="user")
+        storage.new(instructor)
+        storage.new(subject)
+        storage.save()
+        subject_id = subject.id
+
+        # Create a course associated with the subject
+        course = Course(subject_id=subject_id, instructor_id=instructor.id,
+                        title="Test Course", description="Course description")
+        storage.new(course)
+        storage.save()
+
+        # Verify that subject and course exist before deletion
+        self.assertIn(subject, storage.all(Subject).values())
+        self.assertIn(course, storage.all(Course).values())
+
+        # Delete the subject, which should trigger a cascade delete for associated courses
+        storage.delete(subject)  
+
+        # Clear the session to reflect database changes
+        storage.close()
+        storage.reload()
+
+        # Verify that subject and associated course are no longer present
+        self.assertNotIn(subject, storage.all(Subject).values())
+        self.assertNotIn(course, storage.all(Course).values())
+
+
 
 if __name__ == '__main__':
     unittest.main()
