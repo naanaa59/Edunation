@@ -107,3 +107,7 @@ class DBStorage:
         """ Get the enrollment object for a student in a course """
         return self.__session.query(StudentCourses).filter_by(
             student_id=student_id, course_id=course_id).first()
+    
+    def rollback_db(self):
+        """ performs a rollback to undo a insert"""
+        self.__session.rollback()
