@@ -8,7 +8,7 @@ import { useNavigate,  useParams } from 'react-router-dom'
 
 const CousesPage = () => {
   const [courseInfo, setCourseInfo] = useState([]);
-  // const [userInfo, setUserInfo] = useState([]);
+  const [enrollmentMessage, setEnrollmentMessage] = useState('');
   const { courseId } = useParams();
 
   const navigate = useNavigate();
@@ -71,11 +71,22 @@ const CousesPage = () => {
           'Authorization': `Bearer ${token}`,
         },
       });
-      if (!enrollResponse.ok) {
-        throw new Error('Failed to enroll student');
+      if (enrollResponse.ok) {
+        const data = await enrollResponse.json();
+        console.log("Enroll data:", data.message);
+        setEnrollmentMessage('Enrollment successful!')
+      } else if (enrollResponse.status === 400) {
+        console.log("You have already enrolled in that course");
+        setEnrollmentMessage('You have already enrolled in that course');
+
+      } else {
+        console.log(`Failed to enroll student: ${enrollResponse.status}`);
       }
-      const data = await enrollResponse.json();
-      console.log("enroll data", data.message);
+      // if (!enrollResponse.ok) {
+      //   throw new Error('Failed to enroll student');
+      // }
+      // const data = await enrollResponse.json();
+      // console.log("enroll data", data.message);
     } 
     } catch (error) {
       console.log(error);
@@ -97,11 +108,13 @@ const CousesPage = () => {
         <p className='pt-20'>{courseInfo.title}</p>
         <p>{courseInfo.description}</p>
         <div className='lg:max-w flex '>
-        <button onClick={() => enrollStudent(1)} className="rounded-md px-3.5 py-2 m-1 overflow-hidden relative group cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600">
-  <span className="absolute inset-0 bg-indigo-600 transition-all duration-500 ease-in-out transform origin-left scale-x-0 group-hover:scale-x-100"></span>
-  <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease tracking-wider"> Enroll </span>
-</button>
-                </div>
+          <button onClick={() => enrollStudent(1)} className="rounded-md px-3.5 py-2 m-1 overflow-hidden relative group cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600">
+            <span className="absolute inset-0 bg-indigo-600 transition-all duration-500 ease-in-out transform origin-left scale-x-0 group-hover:scale-x-100"></span>
+            <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease tracking-wider"> Enroll </span>
+          </button>
+          
+        </div>
+        {enrollmentMessage && <p className='mt-2 text-gray-600'>{enrollmentMessage}</p>}
       </div>
       
       <Footer />

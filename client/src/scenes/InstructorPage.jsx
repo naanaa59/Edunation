@@ -1,9 +1,10 @@
 import React from 'react'
-
+import Navbar from '../components/Navbar'
 const InstructorPage = () => {
   return (
     <div>
-      <p>Hello there</p>
+      <Navbar />
+      <p className='pt-20'>Hello there</p>
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 import '../styles/styles.css'
 import logo from '../images/logo.png'
 import arrow from '../images/arrow.png'
-import { RxAvatar } from "react-icons/rx";
+import UserMenu from './UserMenu'
 
 const Navbar = () => {
   const [subjects, setSubjects] = useState([]);
@@ -101,7 +101,7 @@ useEffect(() => {
     <div className='m-auto mr-16 flex '>
     {isLoggedIn ? (
       
-      <RxAvatar />
+      <UserMenu />
       
     ) : (
       <>
