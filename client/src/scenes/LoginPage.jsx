@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
-import { useCookies } from 'react-cookie'
+
 
 
 
@@ -24,7 +24,6 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasworError] = useState('');
-  const [cookies, setCookie] = useCookies(['user']);
   const navigate = useNavigate();
 
   const loginUser = async (email, password) => {
@@ -36,11 +35,12 @@ const LoginPage = () => {
         },
         body: JSON.stringify({ email, password }),
       });
-      if (response.ok) {
-        const result = await response.json();
-        // console.log(result)
-        const token = localStorage.setItem('access_token', result.access_token);
-        // navigate('/student/me');
+       if (response.ok) {
+          const result = await response.json();
+      //   // console.log(result)
+          const token = localStorage.setItem('access_token', result.access_token);
+          console.log(token)
+          navigate('/student/me');
 
       }
     } catch (error) {
@@ -60,8 +60,8 @@ const LoginPage = () => {
   }
   return (
     <div className='flex'>
-      <div className='bg-indigo-600 w-1/2 flex justify-center items-center'>
-        <p className='gothic text-4xl text-center text-white'>You're one step close to be part of our community</p>
+      <div className='hero-bg w-1/2 flex justify-center items-center'>
+        <p className='gothic text-4xl text-center text-black'>Welcome back again</p>
       </div>
       <div className='w-1/2 flex flex-col items-center justify-center h-screen'>
         <div className='bg-red-300 '>

@@ -73,6 +73,46 @@ def delete_subject(subject_id):
     storage.save()
     return jsonify({'message': 'Subject deleted successfully'}), 200
 
+# # LOGIN & Register for Instructor
+
+@app.route('/instructor/register', methods=['POST'])
+def create_new_instructor():
+    data = request.get_json()
+    print(data)
+    new_instructor = Instructor(**data)
+    new_instructor.save()
+    return jsonify({'message': 'Student created successfully', 'id': new_instructor.id}), 201
+
+
+def authenticate_instructor(email, password):
+    user = storage.get_user_email(Instructor, email)
+    if not user:
+        # Raise a 404 Not Found if user doesn't exist
+        raise NotFound(description="Email does not exist")
+    if not verify_password(password, user.password):
+        # Raise a 401 Unauthorized if password is incorrect
+        raise Unauthorized(description="Incorrect password")
+    return user
+
+@app.route('/instructor/login', methods=['POST'])
+def login_instructor():
+    data = request.get_json()  # Get the data from the request
+    email = data.get('email')
+    password = data.get('password')
+    try:
+        # Attempt to authenticate the user
+        user = authenticate_instructor(email, password)
+        data = {
+            "sub": user.email,
+            "exp": datetime.utcnow() + timedelta(minutes=60)
+        }
+        print(data["exp"])
+        token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+        return jsonify({"access_token": token, "token_type": "Bearer"}), 200
+    except HTTPException as e:
+        # Catch HTTP exceptions and return the appropriate response
+        return jsonify({"error": e.description}), e.code
+
 
 # CRUD operations for Instructor OK
 @app.route('/instructors', methods=['GET'])
@@ -127,10 +167,11 @@ def get_student(student_id):
     student = storage.get(Student, student_id)
     return jsonify(student.to_dict())
 
-@app.route('/students/register', methods=['POST'])
+@app.route('/student/register', methods=['POST'])
 def create_student():
     data = request.get_json()
     print(data)
+
     new_student = Student(**data)
     new_student.save()
     return jsonify({'message': 'Student created successfully', 'id': new_student.id}), 201
@@ -146,6 +187,7 @@ def authenticate_user(email, password):
         raise Unauthorized(description="Incorrect password")
     return user
 
+# Student Login
 @app.route('/students/login', methods=['POST'])
 def login_student():
     data = request.get_json()  # Get the data from the request
@@ -251,7 +293,7 @@ def get_user_courses():
     authorization = request.headers.get('Authorization')
     user = check_token(authorization)
     student = storage.get(Student, user["id"])
-    all_courses = courses = [enrollment.courses.to_dict() for enrollment in student.student_courses]
+    all_courses  = [enrollment.courses.to_dict() for enrollment in student.student_courses]
     return jsonify({"courses": all_courses})
 
 # This method was for testing without authorization It WORKS :D

@@ -4,7 +4,7 @@ import { GoogleLogin } from '@react-oauth/google'
 // import { jwtDecode } from 'jwt-decode'
 
 
-const RegisterPage = () => {
+const InstructorRegisterPage = () => {
   const responseMessage = (credentialResponse) => {
     // const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
     // console.log(credentialResponseDecoded);
@@ -47,7 +47,7 @@ const RegisterPage = () => {
 
   const RegisterUser = async (name, familyName, email, password) => {
     try {
-      const response = await fetch('http://0.0.0.0:5003/students/register', {
+      const response = await fetch('http://0.0.0.0:5003/instructor/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,8 +85,8 @@ const RegisterPage = () => {
   }
   return (
     <div className='flex'>
-      <div className='bg-section1 w-1/2 flex justify-center items-center'>
-        <p className='gothic text-4xl text-center text-black'>You're one step close to be part of our students community</p>
+      <div className='bg-indigo-600 w-1/2 flex justify-center items-center'>
+        <p className='gothic text-4xl text-center text-white'>You're one step close to be part of our instructors community</p>
       </div>
       <div className='w-1/2 flex flex-col items-center justify-center h-screen'>
         <div className='bg-red-300 '>
@@ -164,4 +164,4 @@ const RegisterPage = () => {
   )
 }
 
-export default RegisterPage;
+export default InstructorRegisterPage;
