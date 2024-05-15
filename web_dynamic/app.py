@@ -32,7 +32,6 @@ def close_db(error):
     """ Remove the current SQLAlchemy Session """
     storage.close()
 
-
 # CRUD operations for Subject OK
 @app.route('/subjects', methods=['GET'])
 def get_subjects():
@@ -392,8 +391,6 @@ def check_token(authorization: str = None):
 
         print("Exception: ", e)
         abort(401, description="Invalid token")
-
-    # Assuming you have a function to get the user by email
     user = storage.get_user_email(Student, Instructor, email)
     return user.to_dict()
 

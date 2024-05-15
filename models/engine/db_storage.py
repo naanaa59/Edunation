@@ -38,7 +38,6 @@ class DBStorage:
                                               EDU_MYSQL_DB))
         if EDU_ENV == "test":
             BaseDB.metadata.drop_all(self.__engine)
-        # self.__session = scoped_session(sessionmaker(bind=self.__engine))
 
         if EDU_ENV == "test":
             BaseDB.metadata.drop_all(self.__engine)
@@ -57,7 +56,6 @@ class DBStorage:
     def new(self, obj):
         """ add an object to the database session """
         self.__session.add(obj)
-        # self.relationship_manager(obj)
 
     def save(self):
         """ commit all changes to database session"""
@@ -67,7 +65,6 @@ class DBStorage:
         """ delete from database session obj if not None"""
         if obj is not None:
             self.__session.delete(obj)
-            # self.__session.commit()
 
     def reload(self):
         """reloads data from the database"""
@@ -75,7 +72,6 @@ class DBStorage:
         sess_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(sess_factory)
         self.__session = Session
-
 
     def close(self):
         """ Call remove() method on the session attribute """
@@ -92,6 +88,7 @@ class DBStorage:
         return None
         
     def get_user_email(self, cls, cls2, email):
+        """ Gets user by email depending on its class"""
         inst = self.__session.query(cls).filter(
             cls.email == email
         ).first()

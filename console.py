@@ -93,7 +93,7 @@ class EDUCommand(cmd.Cmd):
             return False
         print(instance.id)
         instance.save()
-        # models.storage.relationship_manager(instance)
+
 
     def do_show(self, arg):
         """Prints an instance as a string based on the class and id"""
@@ -127,13 +127,6 @@ class EDUCommand(cmd.Cmd):
                     models.storage.save()
                 else:
                     print("** no instance found **")
-
-                # key = args[0] + "." + args[1]
-                # if key in models.storage.all():
-                #     models.storage.all().pop(key)
-                #     models.storage.save()
-                # else:
-                #     print("** no instance found **")
             else:
                 print("** instance id missing **")
         else:
@@ -159,7 +152,6 @@ class EDUCommand(cmd.Cmd):
     def do_update(self, arg):
         """Updates an instance based on the class name, id, and attributes"""
         args = shlex.split(arg)
-        print("Input args:", args)  # Debug print
         if len(args) < 3:
             print("** incomplete command **")
             return False
@@ -184,7 +176,6 @@ class EDUCommand(cmd.Cmd):
                 value = kvp[1].strip('"')
                 attributes[key] = value
 
-        # print("Parsed attributes:", attributes)  # Debug print
         for k, v in attributes.items():
             setattr(obj, k, v)
         models.storage.save()
@@ -228,7 +219,6 @@ enroll <student_id> <course_id>**")
                 student.student_courses.append(enrollment)
             else:
                 return
-            # course.students.append(student)
             models.storage.save()
         
 
