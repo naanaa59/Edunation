@@ -37,7 +37,7 @@ useEffect(() => {
             }
         }
       )
-      const courseResponse = await fetch('http://0.0.0.0:5003/user/me/courses/',
+      const courseResponse = await fetch('http://0.0.0.0:5003/student/courses/',
         {
           method: 'GET',
           headers: {

@@ -91,10 +91,14 @@ class DBStorage:
                     return value
         return None
         
-    def get_user_email(self, cls, email):
+    def get_user_email(self, cls, cls2, email):
         inst = self.__session.query(cls).filter(
             cls.email == email
         ).first()
+        if not inst:
+            inst = self.__session.query(cls2).filter(
+                cls2.email == email
+            ).first()
         return inst
     
     def is_student_enrolled(self, student_id, course_id):

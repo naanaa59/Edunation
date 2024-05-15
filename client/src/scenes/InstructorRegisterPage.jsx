@@ -17,6 +17,7 @@ const InstructorRegisterPage = () => {
   const [familyName, setFamilyName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasworError] = useState('');
@@ -139,10 +140,10 @@ const InstructorRegisterPage = () => {
             <label className='errorLabel'>{passwordError}</label>
         <input 
             type='password'
-            value={password}
+            value={confirmPassword}
             placeholder='Confirm your password'
-            onChange={(e) => setPassword(e.target.value)}
-            className='inputBox'
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className='inputBox mt-4'
         />
             <label className='errorLabel'>{passwordError}</label>
         </div>

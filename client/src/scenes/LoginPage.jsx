@@ -28,7 +28,8 @@ const LoginPage = () => {
 
   const loginUser = async (email, password) => {
     try {
-      const response = await fetch('http://0.0.0.0:5003/students/login', {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('http://0.0.0.0:5003/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -40,7 +41,12 @@ const LoginPage = () => {
       //   // console.log(result)
           const token = localStorage.setItem('access_token', result.access_token);
           console.log(token)
-          navigate('/student/me');
+          if (result.type === "Instructor") {
+            navigate('/instructor/me');
+          }
+          else if (result.type === "Student") {
+            navigate('/student/me');
+          }
 
       }
     } catch (error) {
@@ -52,7 +58,6 @@ const LoginPage = () => {
     e.preventDefault();
     if (email && password) {
       loginUser(email, password);
-      navigate('/student/me');
     } else {
       setEmailError('Email is required')
       setPasworError('Password is required')
@@ -68,9 +73,7 @@ const LoginPage = () => {
           <div className='gothic text-2xl'>Login</div>
         </div>
         <br />
-        <div className='my-4'>
-          <GoogleLogin onSuccess={responseMessage}  onError={errorMessage} />
-        </div>
+        
         <div className='flex flex-col mb-8'>
           <input 
             value={email}
