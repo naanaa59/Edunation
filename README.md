@@ -1,7 +1,7 @@
 # EduNation
 
 <p align="center">
-  <img src="client/src/images/logo.png alt="EduNation Logo" width="200"/>
+  <img src="client/src/images/logo.png" alt="EduNation Logo" width="200"/>
 </p>
 
 
