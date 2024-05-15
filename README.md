@@ -23,6 +23,7 @@ In response to the educational disruptions faced during strikes and protests in 
 <p align="center">
   <img src="client/src/images/mvp_tech.png" alt="EduNation Logo" width="500"/>
 </p>
+
 - **Backend**: SQLAlchemy with MySQL for ORM capabilities and database management.
 - **Testing**: Unitest for rigorous backend testing.
 - **API Design**: RESTful API design principles.
