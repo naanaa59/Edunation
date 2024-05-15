@@ -15,6 +15,7 @@ from jose import JWTError, jwt
 from os import getenv
 from flask_cors import CORS
 from dotenv import load_dotenv
+from functools import wraps
 from sqlalchemy.exc import IntegrityError
 
 SECRET_KEY="e13d15c8879290396492efb62d0a424734fadd0727f19789cf62c206e16c5d2cce065e0f314661d64d083938c1ea7400ac423746e6b57c33ab68a711f1a68d91"
@@ -81,7 +82,7 @@ def create_new_instructor():
     print(data)
     new_instructor = Instructor(**data)
     new_instructor.save()
-    return jsonify({'message': 'Student created successfully', 'id': new_instructor.id}), 201
+    return jsonify({'message': 'Instructor created successfully', 'id': new_instructor.id}), 201
 
 
 def authenticate_instructor(email, password):
@@ -178,7 +179,7 @@ def create_student():
 
 
 def authenticate_user(email, password):
-    user = storage.get_user_email(Student, email)
+    user = storage.get_user_email(Student, Instructor, email)
     if not user:
         # Raise a 404 Not Found if user doesn't exist
         raise NotFound(description="Email does not exist")
@@ -188,7 +189,7 @@ def authenticate_user(email, password):
     return user
 
 # Student Login
-@app.route('/students/login', methods=['POST'])
+@app.route('/user/login', methods=['POST'])
 def login_student():
     data = request.get_json()  # Get the data from the request
     email = data.get('email')
@@ -198,11 +199,13 @@ def login_student():
         user = authenticate_user(email, password)
         data = {
             "sub": user.email,
-            "exp": datetime.utcnow() + timedelta(minutes=60)
-        }
+            "exp": datetime.utcnow() + timedelta(minutes=60),
+            "type": user.__class__.__name__
+            }
         print(data["exp"])
+        print("data", data)
         token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
-        return jsonify({"access_token": token, "token_type": "Bearer"}), 200
+        return jsonify({"access_token": token, "token_type": "Bearer", "type":user.__class__.__name__}), 200
     except HTTPException as e:
         # Catch HTTP exceptions and return the appropriate response
         return jsonify({"error": e.description}), e.code
@@ -253,6 +256,9 @@ def create_course(subject_id, instructor_id):
         return jsonify({'error': "subject not found in dababase"})
     if instructor is None:
         return jsonify({'error': "instructor not found in dababase"})
+    print(type(data))
+    print(data)
+
     course = Course(**data)
     inst_c_instance = InstructorCourses(instructor_id= instructor.id,
                                         course_id=course.id)
@@ -288,13 +294,22 @@ def delete_course(course_id):
 # >---------- RELATIONSHIPS -----------<
 
 # >------ Student's Courses ---------<
-@app.route('/user/me/courses/', methods=['GET'])
+
+@app.route('/student/courses/', methods=['GET'])
 def get_user_courses():
     authorization = request.headers.get('Authorization')
     user = check_token(authorization)
     student = storage.get(Student, user["id"])
     all_courses  = [enrollment.courses.to_dict() for enrollment in student.student_courses]
     return jsonify({"courses": all_courses})
+
+@app.route('/instructor/courses/', methods=['GET'])
+def get_instructor_courses():
+    authorization = request.headers.get('Authorization')
+    user = check_token(authorization)
+    instructor = storage.get(Instructor, user["id"])
+    all_courses  = [inst_course.courses.to_dict() for inst_course in instructor.instructor_courses]
+    return jsonify({"courses": all_courses, "instructor_id": instructor.to_dict()})
 
 # This method was for testing without authorization It WORKS :D
 @app.route('/students/<student_id>/courses/', methods=['GET'])
@@ -379,7 +394,7 @@ def check_token(authorization: str = None):
         abort(401, description="Invalid token")
 
     # Assuming you have a function to get the user by email
-    user = storage.get_user_email(Student, email)
+    user = storage.get_user_email(Student, Instructor, email)
     return user.to_dict()
 
 @app.route('/token_check/', methods=['GET'])
@@ -390,6 +405,32 @@ def client_login():
     print(user)
     return jsonify({"user": user})
 
+# Create getter for the role
+
+def get_user_type_from_token(token):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload.get('type')
+    except jwt.JWTError:
+        return None
+
+# Require Role for all routes
+
+def requires_role(required_role):
+    def decorator(view_func):
+        @wraps(view_func)
+        def decorated_function(*args, **kwargs):
+            token = request.headers.get('Authorization')
+            if not token:
+                return jsonify({'error': 'No token provided.'}), 403
+
+            user_type = get_user_type_from_token(token)
+            if user_type!= required_role:
+                return jsonify({'error': f'Unauthorized: {required_role} role required.'}), 403
+
+            return view_func(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 if __name__ == '__main__':
     app.run(debug=True)

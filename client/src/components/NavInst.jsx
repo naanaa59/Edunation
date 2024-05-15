@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Popover,
-  PopoverHandler,
-  PopoverContent,
-} from "@material-tailwind/react"
 import { Link } from 'react-router-dom'
 import '../styles/styles.css'
 import logo from '../images/logo.png'
-import arrow from '../images/arrow.png'
 import UserMenu from './UserMenu'
 
-const Navbar = () => {
-  const [subjects, setSubjects] = useState([]);
+const NavInst = () => {
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
 useEffect(() => {
@@ -23,22 +17,6 @@ useEffect(() => {
    }
   };
   check_token();
-
-  fetch('http://0.0.0.0:5003/subjects')
-     .then(response => response.json())
-     .then(async (subjectsData) => {
-       console.log('Fetched subjects:', subjectsData);
- 
-       // Fetch courses for each subject
-       const subjectsWithCourses = await Promise.all(subjectsData.map(async (subject) => {
-         const response = await fetch(`http://0.0.0.0:5003/subjects/${subject.id}/courses`);
-         const courses = await response.json();
-         return { ...subject, courses }; // Return a new object with courses added
-       }));
- 
-       setSubjects(subjectsWithCourses);
-     })
-     .catch(error => console.error('Error:', error));
  }, []);
 
 
@@ -47,39 +25,6 @@ useEffect(() => {
       <div className="container  flex items-center gap-10">
         <img src={logo} alt="EduNation" className="w-14 h-14" />
         <Link to="/" className="text-lg text-black font-semibold mr-4">EduNation</Link>
-        
-          <Popover>
-          <PopoverHandler>
-          <div
-              className=' relative group text-lg text-black font-semibold mr-4 cursor-pointer'>
-                <p>Courses</p>
-                <img 
-                  src={arrow} 
-                  alt="Courses"
-                  className='w-3 h-3 absolute top-[0.55rem] left-[4.5rem] group-hover:rotate-90 duration-500'
-                  viewBox="0 0 20 20" />
-            </div>
-          </PopoverHandler>
-          <PopoverContent className='mt-2 z-10 grid grid-cols-3 gap-4'>
-            {subjects.map((subject, index) => (
-            <div key={index}>
-                <p className='font-semibold mr-4 cursor-pointer hover:underline hover:duration-600'>{subject.name}</p>
-                <ul>
-                  {subject.courses.map((course, courseIndex) => (
-                    <Link to={`/courses/${course.id}`}>
-                      <li  key={courseIndex} className='pl-2'>
-                      {course.title}
-                    </li>
-                    </Link>
-                    
-                        ))}
-                </ul>
-            </div>
-      ))}
-          </PopoverContent>
-        </Popover>
-        
-        
         <div className="search">
           <form className="search-form flex items-center">
             <div className="relative">
@@ -119,4 +64,4 @@ useEffect(() => {
   )
 }
 
-export default Navbar
+export default NavInst
