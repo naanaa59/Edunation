@@ -1,6 +1,6 @@
 # EduNation
 
-![EduNation Logo](Pictures/edunation_homepage.png)
+![EduNation Logo](client/src/images/logo.png)
 
 EduNation is an online learning platform designed to ensure uninterrupted education by leveraging technology, developed by Oumaima Naanaa and Badr [insert last name]. This repository contains the backend codebase of EduNation.
 
