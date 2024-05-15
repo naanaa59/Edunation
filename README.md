@@ -20,7 +20,9 @@ EduNation is an online learning platform designed to ensure uninterrupted educat
 In response to the educational disruptions faced during strikes and protests in Morocco in 2023, EduNation was born. The platform aims to facilitate seamless learning experiences for students and educators alike, even during challenging times.
 
 ## Technologies Used
-
+<p align="center">
+  <img src="client/src/images/logo.png" alt="EduNation Logo" width="500"/>
+</p>
 - **Backend**: SQLAlchemy with MySQL for ORM capabilities and database management.
 - **Testing**: Unitest for rigorous backend testing.
 - **API Design**: RESTful API design principles.
