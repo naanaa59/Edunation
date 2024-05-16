@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
+// import { GoogleLogin } from '@react-oauth/google'
 // import { jwtDecode } from 'jwt-decode'
 
 
 const RegisterPage = () => {
-  const responseMessage = (credentialResponse) => {
-    // const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
-    // console.log(credentialResponseDecoded);
-  };
+  // const responseMessage = (credentialResponse) => {
+  //   const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
+  //   console.log(credentialResponseDecoded);
+  // };
 
-  const errorMessage = (error) => {
-    console.log(error);
-  };
+  // const errorMessage = (error) => {
+  //   console.log(error);
+  // };
   const [name, setName] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [email, setEmail] = useState('');
@@ -47,7 +47,7 @@ const RegisterPage = () => {
 
   const RegisterUser = async (name, familyName, email, password) => {
     try {
-      const response = await fetch('http://0.0.0.0:5003/students/register', {
+      const response = await fetch('http://0.0.0.0:5003/student/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const RegisterPage = () => {
     e.preventDefault();
     if (email && password) {
       RegisterUser(name, familyName, email, password);
-    //   setRedirect(true);
+  
         navigate("/login")
     } else {
         setNameError('Full Name is required')
@@ -93,10 +93,10 @@ const RegisterPage = () => {
           <div className='gothic text-2xl'>Register Here</div>
         </div>
         <br />
-        <div className='my-4'>
+        {/* <div className='my-4'>
           <GoogleLogin onSuccess={responseMessage}  onError={errorMessage} />
         </div>
-        <br/>
+        <br/> */}
         <div className='flex gap-4 mb-8'>
             <div className='flex flex-col'>
             <input 

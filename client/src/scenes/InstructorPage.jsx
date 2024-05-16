@@ -180,7 +180,7 @@ const InstructorPage = () => {
   const formData = new FormData(e.target);
   const courseData = Object.fromEntries(formData.entries());
   const subject_id = formData.get('subject_id');
-  const userId = userInfo.user.id; // Correctly accessing userId from userInfo
+  const userId = userInfo; // Correctly accessing userId from userInfo
 
   const fullCourseData = {...courseData, subject_id, userId};
   createCourse(fullCourseData);

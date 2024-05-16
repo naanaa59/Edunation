@@ -1,18 +1,10 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
-// import { jwtDecode } from 'jwt-decode'
+
 
 
 const InstructorRegisterPage = () => {
-  const responseMessage = (credentialResponse) => {
-    // const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
-    // console.log(credentialResponseDecoded);
-  };
 
-  const errorMessage = (error) => {
-    console.log(error);
-  };
   const [name, setName] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [email, setEmail] = useState('');
@@ -94,10 +86,6 @@ const InstructorRegisterPage = () => {
           <div className='gothic text-2xl'>Register Here</div>
         </div>
         <br />
-        <div className='my-4'>
-          <GoogleLogin onSuccess={responseMessage}  onError={errorMessage} />
-        </div>
-        <br/>
         <div className='flex gap-4 mb-8'>
             <div className='flex flex-col'>
             <input 
