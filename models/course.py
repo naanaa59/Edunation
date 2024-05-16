@@ -15,19 +15,13 @@ class Course(Base, BaseDB):
         'confirm_deleted_rows': False
     }
     subject_id = Column(String(60), ForeignKey('subjects.id'), nullable=False)
-    # student_id = Column(String(60), ForeignKey('students.id', ondelete='SET NULL'), nullable=True)
     instructor_id = Column(String(60), ForeignKey('instructors.id'), nullable=False)
-
     title = Column(String(128), nullable=True)
-    # link_video = Column(String(1000), nullable=True)
     link_photo = Column(String(1000), nullable=True)
     description = Column(String(15000), nullable=True)
-
-    subject = relationship("Subject", back_populates="courses")
-    
+    subject = relationship("Subject", back_populates="courses")   
     student_courses = relationship("StudentCourses", back_populates="courses",
                                    cascade="all, delete")
-
     instructor_courses = relationship("InstructorCourses", back_populates="courses",
                                       cascade="all, delete")
 

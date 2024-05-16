@@ -8,17 +8,6 @@ from sqlalchemy import Column, String, Table, ForeignKey
 from sqlalchemy.orm import relationship
 
 
-# subject_courses = Table('subject_courses', BaseDB.metadata,
-#                        Column('subject_id', String(60),
-#                               ForeignKey('subjects.id', onupdate='CASCADE',
-#                                          ondelete='CASCADE'),
-#                               primary_key=True),
-#                        Column('course_id', String(60),
-#                               ForeignKey('courses.id', onupdate='CASCADE',
-#                                          ondelete='CASCADE'),
-#                               primary_key=True))
-                       
-
 class Subject(Base, BaseDB):
     """ Subject Class definition """
     __tablename__ = 'subjects'

@@ -8,13 +8,7 @@ import sqlalchemy
 from sqlalchemy import Column, String, ForeignKey, Table
 from sqlalchemy.orm import relationship
 
-# student_courses = Table('student_courses', BaseDB.metadata,
-#                        Column('student_id', String(60),
-#                               ForeignKey('students.id'),
-#                               primary_key=True),
-#                        Column('course_id', String(60),
-#                               ForeignKey('courses.id'),
-#                               primary_key=True))
+
 class StudentCourses(BaseDB):
     """ Represents the student_courses table """
 
