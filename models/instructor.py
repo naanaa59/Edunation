@@ -21,7 +21,6 @@ class InstructorCourses(BaseDB):
                            onupdate='CASCADE', primary_key=True)
     course_id = Column(String(60), ForeignKey('courses.id', ondelete='CASCADE'),
                        onupdate='CASCADE', primary_key=True)
-
     instructor = relationship("Instructor", back_populates="instructor_courses")
     courses = relationship("Course", back_populates="instructor_courses")
 
