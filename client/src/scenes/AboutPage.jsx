@@ -93,13 +93,13 @@ const AboutPage = () => {
                   <p className='text-gray-700'>Desciption: Sofware Engineer</p>
                   <p className='text-gray-700'>Role: Backend Developer</p>
                   <div className='flex justify-center mt-4'>
-                    <a href='#' className='mr-4  text-blue-500 hover:text-indigo-600 transition-colors duration-400 ease-in'>
+                    <a href='https://twitter.com/naanaa_oumaima' className='mr-4  text-blue-500 hover:text-indigo-600 transition-colors duration-400 ease-in'>
                       <FaTwitter className='w-6 h-6' />
                     </a>
-                    <a href='#' className='mr-4  text-blue-500 hover:text-indigo-600 transition-colors duration-400 ease-in'>
+                    <a href='https://www.linkedin.com/in/oumaima-naanaa/' className='mr-4  text-blue-500 hover:text-indigo-600 transition-colors duration-400 ease-in'>
                       <FaLinkedin className='w-6 h-6'/>
                     </a>
-                    <a href='#' className=' text-blue-500 hover:text-indigo-600 transition-colors duration-400 ease-in'>
+                    <a href='https://github.com/naanaa59' className=' text-blue-500 hover:text-indigo-600 transition-colors duration-400 ease-in'>
                       <FaGithub className='w-6 h-6' />
                     </a>
                   </div>

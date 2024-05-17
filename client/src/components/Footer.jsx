@@ -77,7 +77,7 @@ const Footer = () => {
               <p>Oumaima Naanaa</p>
               <div className='flex flex-row gap-4 my-4'>
                 <a href='https://www.linkedin.com/in/oumaima-naanaa/' rel="noreferrer" target='_blank'><BsLinkedin className='w-8 h-8 hover:text-indigo-600 transition-colors duration-400 ease-in' /></a>
-                <a href=' https://github.com/naanaa59' rel="noreferrer" target='_blank'><FaGithub className='w-8 h-8 hover:text-indigo-600 transition-colors duration-400 ease-in' /></a>
+                <a href='https://github.com/naanaa59' rel="noreferrer" target='_blank'><FaGithub className='w-8 h-8 hover:text-indigo-600 transition-colors duration-400 ease-in' /></a>
                 <a href='https://twitter.com/naanaa_oumaima' rel="noreferrer" target='_blank'> <FaTwitter className='w-8 h-8 hover:text-indigo-600 transition-colors duration-400 ease-in' /></a>
               </div>
             </li>

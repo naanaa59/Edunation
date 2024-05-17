@@ -33,7 +33,7 @@ const InstructorRegisterPage = () => {
     } else if (!symbol.test(pwd)) {
       return 'Password should at least have one symbol';
     } else {
-      return null; // No error
+      return null; 
     }
   };
 

@@ -71,7 +71,10 @@ const InstructorPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(courseData),
+        body: JSON.stringify(({
+          ...courseData,
+          instructor_id: userId
+        }),),
       });
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -168,6 +171,7 @@ const InstructorPage = () => {
           const courseData = Object.fromEntries(formData.entries());
           const subject_id = formData.get('subject_id');
           const userId = userInfo.id;
+          
 
           await createCourse(courseData, subject_id, userId);
         }} className="mt-8 space-y-4">
@@ -179,7 +183,7 @@ const InstructorPage = () => {
             ))}
           </select>
           <input type="file" name="link_photo" accept="image/*" className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
-          <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Create Course</button>
+          <button type="submit" className=" px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Create Course</button>
         </form>
 
         <h2 className="text-xl font-bold mt-8">Create Subject</h2>
