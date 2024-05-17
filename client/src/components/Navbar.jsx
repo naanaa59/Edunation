@@ -104,13 +104,7 @@ useEffect(() => {
       <UserMenu />
       
     ) : (
-      <>
-        <a href="/login" class="rounded-sm px-2 py-2 m-1 overflow-hidden  cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600 transition-colors duration-300 ease-in-out delay-150 hover:text-white hover:bg-indigo-600 hover:rounded-xl">
-          Login
-        </a>
-        <a href="/register" class="rounded-sm px-2 py-2 m-1 overflow-hidden  cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600 hover:text-white hover:bg-indigo-600 transition duration-300 ease-in-out delay-150 hover:rounded-xl">
-          Register                 
-        </a>              
+      <>            
       </>
     )}
     </div>

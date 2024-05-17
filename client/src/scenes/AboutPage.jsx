@@ -6,6 +6,7 @@ import Typical from 'react-typical'
 import { FaTwitter, FaLinkedin, FaGithub } from 'react-icons/fa';
 import aboutus from '../images/about.png'
 import badr from '../images/Badr.jpeg'
+import oumaima from '../images/oumaima.png'
 
 const AboutPage = () => {
   return (
@@ -83,7 +84,7 @@ const AboutPage = () => {
             <div className='p-6'>
               <div className='bg-gray-100 rounded-lg shadow-lg overflow-hidden transform transition duration-500 hover:scale-105'>
                 <img
-                  src='https://via.placeholder.com/150'
+                  src={oumaima}
                   alt='Team Member 2'
                   className='w-full'
                 />

@@ -246,21 +246,23 @@ def get_course(course_id):
 
 @app.route('/courses/<subject_id>/<instructor_id>', methods=['POST'])
 def create_course(subject_id, instructor_id):
+    print(subject_id, instructor_id)
     data = request.get_json()
+    print(type(data))
+    print("data: ",data)
     # if 'subject_id' not in data or 'instructor_id' not in data:
     if not subject_id or not instructor_id:
         return jsonify({'error': 'subject_id and instructor_id are required'}), 400
-    subject_ins= storage.get(Subject, data["subject_id"])
-    instructor = storage.get(Instructor, data["instructor_id"])
+    subject_ins= storage.get(Subject, subject_id)
+    instructor = storage.get(Instructor, instructor_id)
     if subject_ins is None:
         return jsonify({'error': "subject not found in dababase"})
     if instructor is None:
         return jsonify({'error': "instructor not found in dababase"})
-    print(type(data))
-    print(data)
-
+    if storage.check_course(Course, data["title"]):
+        return jsonify({'error': "Course is already created"}), 409
     course = Course(**data)
-    inst_c_instance = InstructorCourses(instructor_id= instructor.id,
+    inst_c_instance = InstructorCourses(instructor_id= instructor_id,
                                         course_id=course.id)
 
     subject_ins.courses.append(course)
@@ -309,7 +311,8 @@ def get_instructor_courses():
     user = check_token(authorization)
     instructor = storage.get(Instructor, user["id"])
     all_courses  = [inst_course.courses.to_dict() for inst_course in instructor.instructor_courses]
-    return jsonify({"courses": all_courses, "instructor_id": instructor.to_dict()})
+    print("all courses",all_courses)
+    return jsonify({"courses": all_courses, "instructor_id": instructor.id})
 
 # This method was for testing without authorization It WORKS :D
 @app.route('/students/<student_id>/courses/', methods=['GET'])
@@ -395,7 +398,9 @@ def check_token(authorization: str = None):
 
     # Assuming you have a function to get the user by email
     user = storage.get_user_email(Student, Instructor, email)
-    return user.to_dict()
+    user_info = user.to_dict()
+    user_info["type"] = user.__class__.__name__
+    return user_info
 
 @app.route('/token_check/', methods=['GET'])
 def client_login():
@@ -413,24 +418,6 @@ def get_user_type_from_token(token):
         return payload.get('type')
     except jwt.JWTError:
         return None
-
-# Require Role for all routes
-
-def requires_role(required_role):
-    def decorator(view_func):
-        @wraps(view_func)
-        def decorated_function(*args, **kwargs):
-            token = request.headers.get('Authorization')
-            if not token:
-                return jsonify({'error': 'No token provided.'}), 403
-
-            user_type = get_user_type_from_token(token)
-            if user_type!= required_role:
-                return jsonify({'error': f'Unauthorized: {required_role} role required.'}), 403
-
-            return view_func(*args, **kwargs)
-        return decorated_function
-    return decorator
 
 if __name__ == '__main__':
     app.run(debug=True)

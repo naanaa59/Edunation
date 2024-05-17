@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
-import { jwtDecode } from 'jwt-decode'
 
 
 
@@ -11,14 +9,6 @@ const LoginPage = () => {
   if (token) {
     
   }
-  const responseMessage = (credentialResponse) => {
-    const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
-    console.log(credentialResponseDecoded);
-  };
-
-  const errorMessage = (error) => {
-    console.log(error);
-  };
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -86,6 +76,7 @@ const LoginPage = () => {
         <br />
         <div className='flex flex-col'>
         <input 
+            type='password'
             value={password}
             placeholder='Enter your password'
             onChange={(e) => setPassword(e.target.value)}

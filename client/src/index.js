@@ -9,7 +9,7 @@ import NotFoundPage from './scenes/NotFoundPage';
 import StudentPage from './scenes/StudentPage';
 import InstructorPage from './scenes/InstructorPage';
 import RegisterPage from './scenes/RegisterPage';
-import InstructorRegisterPage from './scenes/InstructorRegisterPage';
+import InstructorRegisterPage from './scenes/InstructorPage';
 
 createRoot(document.getElementById('root')).render(
     <Router>

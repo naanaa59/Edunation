@@ -90,7 +90,14 @@ class DBStorage:
                 if (value.id == id):
                     return value
         return None
-        
+    
+    def check_course(self, cls, title):
+        """ Checks if the course is already created """
+        inst= self.__session.query(cls.title).filter(
+            cls.title == title
+        ).first()
+        return inst is not None
+
     def get_user_email(self, cls, cls2, email):
         inst = self.__session.query(cls).filter(
             cls.email == email

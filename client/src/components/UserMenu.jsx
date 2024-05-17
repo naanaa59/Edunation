@@ -1,9 +1,40 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { Popover } from '@headlessui/react';
 import { RxAvatar } from 'react-icons/rx';
 import { Link } from 'react-router-dom';
 
 const UserMenu = () => {
+  const [role, setRole] = useState('');
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        try {
+          const result = await fetch('http://0.0.0.0:5003/token_check/', {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            }
+          });
+          if (result.ok) {
+            const userData = await result.json();
+            const user = userData.user;
+            console.log("user type: ", user.type)
+            setRole(user.type);
+          } else {
+            console.error("Failed to fetch user data.");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserRole();
+  }, []);
+
+  
   return (
     <div className="relative inline-block text-left">
       <Popover>
@@ -22,7 +53,7 @@ const UserMenu = () => {
                 My Profile
               </Link>
               <Link
-                to="/student/me"
+                to={role === "Instructor" ? "/instructor/me" : "/student/me"}
                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 My Courses
