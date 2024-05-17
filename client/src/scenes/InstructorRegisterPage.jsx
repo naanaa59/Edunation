@@ -1,10 +1,8 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-
-
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const InstructorRegisterPage = () => {
-
   const [name, setName] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [email, setEmail] = useState('');
@@ -12,31 +10,32 @@ const InstructorRegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nameError, setNameError] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasworError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
+  const validatePassword = (pwd) => {
+    const lowerCase = /[a-z]/;
+    const upperCase = /[A-Z]/;
+    const number = /[0-9]/;
+    const symbol = /[!@#$%^&*]/;
 
-//   function validatPassword(pwd) {
-//     const lowerCase = /[a-z]/;
-//     const upperCase = /[A-Z]/;
-//     const number = /[0-9]/;
-//     const symbol = /[!@#$%^&*]/;
-//     const valid = 0;
-
-//     if (pwd.length < 8) {
-//         $('.err-pwd').text('Use 8 characters or more for your password');
-//     } else if (!lowerCase.test(pwd)) {
-//         $('.err-pwd').text('Password should at least have one lowercase letter');
-//     } else if (!upperCase.test(pwd)) {
-//         $('.err-pwd').text('Password should at least have one uppercase letter');
-//     } else if (!number.test(pwd)) {
-//         $('.err-pwd').text('Password should at least have one number');
-//     } else if (!symbol.test(pwd)) {
-//         $('.err-pwd').text('Password should at least have one symbol');
-//     } else {
-//         valid = 1;
-//     }
-// }
+    if (pwd.length < 8) {
+      return 'Use 8 characters or more for your password';
+    } else if (!lowerCase.test(pwd)) {
+      return 'Password should at least have one lowercase letter';
+    } else if (!upperCase.test(pwd)) {
+      return 'Password should at least have one uppercase letter';
+    } else if (!number.test(pwd)) {
+      return 'Password should at least have one number';
+    } else if (!symbol.test(pwd)) {
+      return 'Password should at least have one symbol';
+    } else {
+      return null; // No error
+    }
+  };
 
   const RegisterUser = async (name, familyName, email, password) => {
     try {
@@ -45,37 +44,68 @@ const InstructorRegisterPage = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({"first_name": name,
-                                "last_name": familyName,
-                                "email": email,
-                                "password": password
-    }),
+        body: JSON.stringify({
+          "first_name": name,
+          "last_name": familyName,
+          "email": email,
+          "password": password
+        }),
       });
       if (response.ok) {
         const result = await response.json();
-        console.log(result)
+        console.log(result);
+        navigate("/login");
       } else {
-        // Handle network error
         console.error('Network error');
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
-  
+
   const onButtonClick = (e) => {
     e.preventDefault();
-    if (email && password) {
-      RegisterUser(name, familyName, email, password);
-    //   setRedirect(true);
-        navigate("/login")
+    const pwdError = validatePassword(password);
+    const confirmPwdError = validatePassword(confirmPassword);
+
+    if (!name) {
+      setNameError('Full Name is required');
     } else {
-        setNameError('Full Name is required')
-      setEmailError('Email is required')
-      setPasworError('Password is required')
+      setNameError('');
     }
-    
-  }
+
+    if (!email) {
+      setEmailError('Email is required');
+    } else {
+      setEmailError('');
+    }
+
+    if (pwdError) {
+      setPasswordError(pwdError);
+    } else if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+    } else {
+      setPasswordError('');
+    }
+
+    if (!pwdError && !confirmPwdError && password === confirmPassword && name && email) {
+      RegisterUser(name, familyName, email, password);
+    }
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const confirmPwd = e.target.value;
+    setConfirmPassword(confirmPwd);
+    const error = validatePassword(confirmPwd);
+    if (password !== confirmPwd) {
+      setConfirmPasswordError('Passwords do not match');
+    } else if (error) {
+      setConfirmPasswordError(error);
+    } else {
+      setConfirmPasswordError('');
+    }
+  };
+
   return (
     <div className='flex'>
       <div className='bg-indigo-600 w-1/2 flex justify-center items-center'>
@@ -87,53 +117,67 @@ const InstructorRegisterPage = () => {
         </div>
         <br />
         <div className='flex gap-4 mb-8'>
-            <div className='flex flex-col'>
-            <input 
-                value={name}
-                placeholder='Name'
-                onChange={(e) => setName(e.target.value)}
-                className='inputBox'
-                />
-                <label className='errorLabel'>{nameError}</label>
-            </div>
-            <br />
-            <div className='flex flex-col'>
-            <input 
-                value={familyName}
-                placeholder='Family Name'
-                onChange={(e) => setFamilyName(e.target.value)}
-                className='inputBox'
-                />
-                <label className='errorLabel'>{nameError}</label>
-            </div>
+          <div className='flex flex-col'>
+            <input
+              value={name}
+              placeholder='Name'
+              onChange={(e) => setName(e.target.value)}
+              className='inputBox'
+            />
+            <label className='errorLabel'>{nameError}</label>
+          </div>
+          <br />
+          <div className='flex flex-col'>
+            <input
+              value={familyName}
+              placeholder='Family Name'
+              onChange={(e) => setFamilyName(e.target.value)}
+              className='inputBox'
+            />
+            <label className='errorLabel'>{nameError}</label>
+          </div>
         </div>
         <div className='flex flex-col mb-8'>
-          <input 
+          <input
             value={email}
             placeholder='Enter your email'
             onChange={(e) => setEmail(e.target.value)}
             className='inputBox'
-            />
-            <label className='errorLabel'>{emailError}</label>
+          />
+          <label className='errorLabel'>{emailError}</label>
         </div>
         <br />
-        <div className='flex flex-col '>
-        <input 
-            type='password'
+        <div className='flex flex-col relative mb-4'>
+          <input
+            type={showPassword ? 'text' : 'password'}
             value={password}
             placeholder='Enter your password'
             onChange={(e) => setPassword(e.target.value)}
             className='inputBox'
-        />
-            <label className='errorLabel'>{passwordError}</label>
-        <input 
-            type='password'
+          />
+          <label className='errorLabel'>{passwordError}</label>
+          <span
+            className='absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer'
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+        <div className='flex flex-col relative mb-4'>
+          <input
+            type={showConfirmPassword ? 'text' : 'password'}
             value={confirmPassword}
             placeholder='Confirm your password'
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={handleConfirmPasswordChange}
             className='inputBox mt-4'
-        />
-            <label className='errorLabel'>{passwordError}</label>
+          />
+          <label className='errorLabel'>{confirmPasswordError}</label>
+          <span
+            className='absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer'
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
         </div>
         <br />
         <div>
@@ -147,10 +191,9 @@ const InstructorRegisterPage = () => {
             </span>
           </Link>
         </div>
+      </div>
     </div>
-    </div>
-    
-  )
+  );
 }
 
 export default InstructorRegisterPage;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import NavInst from '../components/NavInst';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ const InstructorPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       const token = localStorage.getItem("access_token");
@@ -27,7 +27,7 @@ const InstructorPage = () => {
       } else {
         navigate("/login");
       }
-      
+      await new Promise(resolve => setTimeout(resolve, 1000));
       const response = await fetch('http://0.0.0.0:5003/instructor/courses/', {
         method: 'GET',
         headers: {
@@ -45,9 +45,9 @@ const InstructorPage = () => {
       console.error(error);
       navigate('/404');
     }
-  };
+  }, [navigate]);
 
-  const fetchSubjects = async () => {
+  const fetchSubjects = useCallback(async () => {
     try {
       const response = await fetch('http://0.0.0.0:5003/subjects');
       if (!response.ok) {
@@ -60,7 +60,7 @@ const InstructorPage = () => {
       console.error(error);
       navigate('/404');
     }
-  };
+  }, [navigate]);
 
   const createCourse = async (courseData, subject_id, userId) => {
     console.log("InstructorId: ", userId);
@@ -117,15 +117,16 @@ const InstructorPage = () => {
       navigate('/404');
     }
   };
-//eslint-disable-next-line
+
   useEffect(() => {
     fetchCourses();
     fetchSubjects();
-  }, []);
+  }, [fetchCourses, fetchSubjects]);
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
 
   return (
     <div>

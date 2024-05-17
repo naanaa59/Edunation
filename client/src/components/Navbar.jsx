@@ -80,8 +80,8 @@ useEffect(() => {
         </Popover>
         
         
-        <div className="search">
-          <form className="search-form flex items-center">
+        <div className="search hidden  lg:block">
+          <form className="search-form flex items-center ">
             <div className="relative">
               {/* Search Input */}
               <input type="search" id="default-search" className="flex-grow pl-8 pr-2 py-2 text-sm text-gray-900  rounded-lg bg-gray-400 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-800 dark:placeholder-white dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-white" placeholder="Search..." required />
