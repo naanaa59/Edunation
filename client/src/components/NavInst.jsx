@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/styles.css'
-import logo from '../images/logo.png'
+import edunation from '../images/edunation.png'
 import UserMenu from './UserMenu'
 
 const NavInst = () => {
@@ -23,8 +23,9 @@ useEffect(() => {
   return (
     <nav className=" bg-white w-full fixed flex flex-row items-center z-10 shadow-2xl">
       <div className="container  flex items-center gap-10">
-        <img src={logo} alt="EduNation" className="w-14 h-14" />
-        <Link to="/" className="text-lg text-black font-semibold mr-4">EduNation</Link>
+      <Link to="/" className="text-lg text-black font-semibold mr-4">
+          <img src={edunation} alt="Edunation" />
+        </Link>
         <div className="search">
           <form className="search-form flex items-center">
             <div className="relative">

@@ -6,7 +6,7 @@ import {
 } from "@material-tailwind/react"
 import { Link } from 'react-router-dom'
 import '../styles/styles.css'
-import logo from '../images/logo.png'
+import edunation from '../images/edunation.png'
 import arrow from '../images/arrow.png'
 import UserMenu from './UserMenu'
 
@@ -45,8 +45,10 @@ useEffect(() => {
   return (
     <nav className=" bg-white w-full fixed flex flex-row items-center z-10 shadow-2xl">
       <div className="container  flex items-center gap-10">
-        <img src={logo} alt="EduNation" className="w-14 h-14" />
-        <Link to="/" className="text-lg text-black font-semibold mr-4">EduNation</Link>
+        {/* <img src={logo} alt="EduNation" className="w-14 h-14" /> */}
+        <Link to="/" className="w-1/3 lg:w-1/6 my-2">
+          <img src={edunation} alt="Edunation" />
+        </Link>
         
           <Popover>
           <PopoverHandler>

@@ -24,8 +24,12 @@ ALGORITHM = "HS256"
 
 load_dotenv()
 
+
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
+
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.teardown_appcontext
 def close_db(error):
@@ -244,31 +248,46 @@ def get_course(course_id):
     else:
         return jsonify({'message': 'Course not found'}), 404
 
+import os
+from flask import request, jsonify
+
+# Define a base directory for saving files and create a new course
+UPLOAD_FOLDER = 'uploads'
+
 @app.route('/courses/<subject_id>/<instructor_id>', methods=['POST'])
 def create_course(subject_id, instructor_id):
-    print(subject_id, instructor_id)
-    data = request.get_json()
-    print(type(data))
-    print("data: ",data)
-    # if 'subject_id' not in data or 'instructor_id' not in data:
+    data = request.form.to_dict()
+    file = request.files.get('link_photo')
+
     if not subject_id or not instructor_id:
         return jsonify({'error': 'subject_id and instructor_id are required'}), 400
-    subject_ins= storage.get(Subject, subject_id)
+
+    subject_ins = storage.get(Subject, subject_id)
     instructor = storage.get(Instructor, instructor_id)
+    
     if subject_ins is None:
-        return jsonify({'error': "subject not found in dababase"})
+        return jsonify({'error': "subject not found in database"})
     if instructor is None:
-        return jsonify({'error': "instructor not found in dababase"})
+        return jsonify({'error': "instructor not found in database"})
     if storage.check_course(Course, data["title"]):
         return jsonify({'error': "Course is already created"}), 409
-    course = Course(**data)
-    inst_c_instance = InstructorCourses(instructor_id= instructor_id,
-                                        course_id=course.id)
 
+    course = Course(**data)
+
+    if file:
+        # Create the uploads directory if it doesn't exist
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        
+        # Save the file and set the link_photo attribute
+        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+        file.save(file_path)
+        course.link_photo = file_path
+
+    inst_c_instance = InstructorCourses(instructor_id=instructor_id, course_id=course.id)
     subject_ins.courses.append(course)
     course.subject = subject_ins
-    course.instructor_courses.append(inst_c_instance)      
-    instructor.instructor_courses.append(inst_c_instance)          
+    course.instructor_courses.append(inst_c_instance)
+    instructor.instructor_courses.append(inst_c_instance)
     course.save()
 
     return jsonify({'message': 'Course created successfully', 'id': course.id}), 201

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import NavInst from '../components/NavInst';
 import { useNavigate } from 'react-router-dom';
+import oneCall from '../components/inputHandler';
 
 const InstructorPage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -8,7 +9,8 @@ const InstructorPage = () => {
   const [subjects, setSubjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-
+  const [img, setImg] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const fetchCourses = useCallback(async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -62,30 +64,46 @@ const InstructorPage = () => {
     }
   }, [navigate]);
 
-  const createCourse = async (courseData, subject_id, userId) => {
-    console.log("InstructorId: ", userId);
-    console.log("Subject_id: ", subject_id);
-    try {
-      const response = await fetch(`http://localhost:5003/courses/${subject_id}/${userId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(({
-          ...courseData,
-          instructor_id: userId
-        }),),
-      });
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      await response.json();
-      fetchCourses();
-    } catch (error) {
-      console.error(error);
-      navigate('/404');
+  const createCourse = async (courseData, subject_id, userId, img) => {
+    const form = new FormData();
+    form.append("title", courseData.title);
+    form.append("description", courseData.description);
+    form.append("subject_id", subject_id);
+    form.append("instructor_id", userId);
+
+    if (img) {
+        form.append("link_photo", img);
     }
-  };
+
+    try {
+        const response = await fetch(`http://localhost:5003/courses/${subject_id}/${userId}`, {
+            method: 'POST',
+            body: form,
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        await response.json();
+        fetchCourses();
+    } catch (error) {
+        console.error(error);
+        navigate('/404');
+    }
+};
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const courseData = {
+        title: formData.get('title'),
+        description: formData.get('description')
+    };
+    const subject_id = formData.get('subject_id');
+    const userId = userInfo.id;
+
+    await createCourse(courseData, subject_id, userId, img);
+};
 
   const deleteCourse = async (courseId) => {
     try {
@@ -129,6 +147,14 @@ const InstructorPage = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+// eslint-disable-next-line
+  const uploadPictureOnce = oneCall();
+
+  const inputFile = (e) => {
+    setImg(e.target.files[0]);
+    setSelectedImage(URL.createObjectURL(e.target.files[0]));
+  };
+
 
 
   return (
@@ -165,26 +191,22 @@ const InstructorPage = () => {
         ))}
 
         <h2 className="text-xl font-bold mt-8">Create Course</h2>
-        <form onSubmit={async (e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target);
-          const courseData = Object.fromEntries(formData.entries());
-          const subject_id = formData.get('subject_id');
-          const userId = userInfo.id;
-          
+        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+    <input type="text" name="title" placeholder="Course Title" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
+    <input type="text" name="description" placeholder="Course Description" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
+    <select name="subject_id" className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none">
+        {subjects.map((subject) => (
+            <option key={subject.id} value={subject.id}>{subject.name}</option>
+        ))}
+    </select>
+    <div className="imageCon w-[300px]">
+        {selectedImage && <img src={selectedImage} alt="SelectedImage" />}
+    </div>
+    <label htmlFor="imageHandler" className='px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-600'>Upload Course's Image</label>
+    <input onChange={inputFile} id="imageHandler" type="file" name="link_photo" accept="image/jpeg" className="w-full px-3 py-2 hidden border rounded focus:border-blue-500 focus:outline-none" />
+    <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Create Course</button>
+</form>
 
-          await createCourse(courseData, subject_id, userId);
-        }} className="mt-8 space-y-4">
-          <input type="text" name="title" placeholder="Course Title" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
-          <input type="text" name="description" placeholder="Course Description" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
-          <select name="subject_id" className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none">
-            {subjects.map((subject) => (
-              <option key={subject.id} value={subject.id}>{subject.name}</option>
-            ))}
-          </select>
-          <input type="file" name="link_photo" accept="image/*" className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
-          <button type="submit" className=" px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Create Course</button>
-        </form>
 
         <h2 className="text-xl font-bold mt-8">Create Subject</h2>
         <form onSubmit={(e) => {

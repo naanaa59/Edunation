@@ -52,7 +52,7 @@ const AboutPage = () => {
               </div>
           </div>
         </div>
-        <div className='h-screen '>
+        <div className='h-auto '>
             <p className='flex flex-col lg:flex-row justify-center text-3xl py-6'>Meet Our Team</p>
             {/* { CARDS } */}
             <div className='flex flex-col lg:flex-row justify-center'>

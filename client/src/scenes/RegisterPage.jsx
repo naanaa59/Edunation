@@ -1,167 +1,207 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-// import { GoogleLogin } from '@react-oauth/google'
-// import { jwtDecode } from 'jwt-decode'
-
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const RegisterPage = () => {
-  // const responseMessage = (credentialResponse) => {
-  //   const credentialResponseDecoded = jwtDecode(credentialResponse.credential);
-  //   console.log(credentialResponseDecoded);
-  // };
-
-  // const errorMessage = (error) => {
-  //   console.log(error);
-  // };
   const [name, setName] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [nameError, setNameError] = useState('');
+  const [familyNameError, setFamilyNameError] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasworError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
+  const validatePassword = (pwd) => {
+    const lowerCase = /[a-z]/;
+    const upperCase = /[A-Z]/;
+    const number = /[0-9]/;
+    const symbol = /[!@#$%^&*]/;
 
-//   function validatPassword(pwd) {
-//     const lowerCase = /[a-z]/;
-//     const upperCase = /[A-Z]/;
-//     const number = /[0-9]/;
-//     const symbol = /[!@#$%^&*]/;
-//     const valid = 0;
+    if (pwd.length < 8) {
+      return 'Use 8 characters or more for your password';
+    } else if (!lowerCase.test(pwd)) {
+      return 'Password should at least have one lowercase letter';
+    } else if (!upperCase.test(pwd)) {
+      return 'Password should at least have one uppercase letter';
+    } else if (!number.test(pwd)) {
+      return 'Password should at least have one number';
+    } else if (!symbol.test(pwd)) {
+      return 'Password should at least have one symbol';
+    } else {
+      return null;
+    }
+  };
 
-//     if (pwd.length < 8) {
-//         $('.err-pwd').text('Use 8 characters or more for your password');
-//     } else if (!lowerCase.test(pwd)) {
-//         $('.err-pwd').text('Password should at least have one lowercase letter');
-//     } else if (!upperCase.test(pwd)) {
-//         $('.err-pwd').text('Password should at least have one uppercase letter');
-//     } else if (!number.test(pwd)) {
-//         $('.err-pwd').text('Password should at least have one number');
-//     } else if (!symbol.test(pwd)) {
-//         $('.err-pwd').text('Password should at least have one symbol');
-//     } else {
-//         valid = 1;
-//     }
-// }
-
-  const RegisterUser = async (name, familyName, email, password) => {
+  const registerUser = async (name, familyName, email, password) => {
     try {
       const response = await fetch('http://0.0.0.0:5003/student/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({"first_name": name,
-                                "last_name": familyName,
-                                "email": email,
-                                "password": password
-    }),
+        body: JSON.stringify({
+          "first_name": name,
+          "last_name": familyName,
+          "email": email,
+          "password": password
+        }),
       });
       if (response.ok) {
         const result = await response.json();
-        console.log(result)
+        console.log(result);
+        navigate("/login");
       } else {
-        // Handle network error
         console.error('Network error');
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
-  
+
   const onButtonClick = (e) => {
     e.preventDefault();
-    if (email && password) {
-      RegisterUser(name, familyName, email, password);
-  
-        navigate("/login")
+    const pwdError = validatePassword(password);
+    const confirmPwdError = validatePassword(confirmPassword);
+
+    if (!name) {
+      setNameError('Name is required');
     } else {
-        setNameError('Full Name is required')
-      setEmailError('Email is required')
-      setPasworError('Password is required')
+      setNameError('');
     }
-    
-  }
+
+    if (!familyName) {
+      setFamilyNameError('Family Name is required');
+    } else {
+      setFamilyNameError('');
+    }
+
+    if (!email) {
+      setEmailError('Email is required');
+    } else {
+      setEmailError('');
+    }
+
+    if (pwdError) {
+      setPasswordError(pwdError);
+    } else if (password !== confirmPassword) {
+      setPasswordError('Passwords do not match');
+    } else {
+      setPasswordError('');
+    }
+
+    if (!pwdError && !confirmPwdError && password === confirmPassword && name && familyName && email) {
+      registerUser(name, familyName, email, password);
+    }
+  };
+
+  const handleConfirmPasswordChange = (e) => {
+    const confirmPwd = e.target.value;
+    setConfirmPassword(confirmPwd);
+    const error = validatePassword(confirmPwd);
+    if (password !== confirmPwd) {
+      setConfirmPasswordError('Passwords do not match');
+    } else if (error) {
+      setConfirmPasswordError(error);
+    } else {
+      setConfirmPasswordError('');
+    }
+  };
+
   return (
-    <div className='flex'>
-      <div className='bg-section1 w-1/2 flex justify-center items-center'>
-        <p className='gothic text-4xl text-center text-black'>You're one step close to be part of our students community</p>
+    <div className='flex flex-col md:flex-row h-screen'>
+      <div className='bg-section1 md:w-1/2 flex justify-center items-center p-4'>
+        <p className='gothic text-2xl md:text-4xl text-center text-black'>You're one step close to being part of our students community</p>
       </div>
-      <div className='w-1/2 flex flex-col items-center justify-center h-screen'>
-        <div className='bg-red-300 '>
-          <div className='gothic text-2xl'>Register Here</div>
-        </div>
-        <br />
-        {/* <div className='my-4'>
-          <GoogleLogin onSuccess={responseMessage}  onError={errorMessage} />
-        </div>
-        <br/> */}
-        <div className='flex gap-4 mb-8'>
+      <div className='md:w-1/2 flex flex-col items-center justify-center p-4'>
+        <div className=' bg-blue-100 p-4 w-full max-w-md border border-gray-300 shadow-xl rounded-lg'>
+          <div className=' gothic text-2xl text-center mb-4'>Register Here</div>
+          <form className='space-y-4'>
             <div className='flex flex-col'>
-            <input 
+              <input
                 value={name}
                 placeholder='Name'
                 onChange={(e) => setName(e.target.value)}
-                className='inputBox'
-                />
-                <label className='errorLabel'>{nameError}</label>
+                className='inputBox p-2 border border-gray-300 rounded'
+              />
+              <label className='errorLabel text-red-600'>{nameError}</label>
             </div>
-            <br />
             <div className='flex flex-col'>
-            <input 
+              <input
                 value={familyName}
                 placeholder='Family Name'
                 onChange={(e) => setFamilyName(e.target.value)}
-                className='inputBox'
-                />
-                <label className='errorLabel'>{nameError}</label>
+                className='inputBox p-2 border border-gray-300 rounded'
+              />
+              <label className='errorLabel text-red-600'>{familyNameError}</label>
             </div>
+            <div className='flex flex-col'>
+              <input
+                value={email}
+                placeholder='Enter your email'
+                onChange={(e) => setEmail(e.target.value)}
+                className='inputBox p-2 border border-gray-300 rounded'
+              />
+              <label className='errorLabel text-red-600'>{emailError}</label>
+            </div>
+            <div className='flex flex-col relative'>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                placeholder='Enter your password'
+                onChange={(e) => setPassword(e.target.value)}
+                className='inputBox p-2 border border-gray-300 rounded'
+              />
+              <label className='errorLabel text-red-600'>{passwordError}</label>
+              <span
+                className='absolute right-[1.4rem] top-[1.6rem] transform -translate-y-1/2 cursor-pointer'
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+            <div className='flex flex-col relative'>
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                placeholder='Confirm your password'
+                onChange={handleConfirmPasswordChange}
+                className='inputBox p-2 border border-gray-300 rounded'
+              />
+              <label className='errorLabel text-red-600'>{confirmPasswordError}</label>
+              <span
+                className='absolute right-[1.4rem] top-[1.6rem] transform -translate-y-1/2 cursor-pointer'
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+            <div>
+              <button
+                className="bg-indigo-600 text-white py-2 px-4 rounded w-full"
+                onClick={onButtonClick}
+              >
+                Register
+              </button>
+            </div>
+          </form>
+          <div className='flex justify-center gap-2 text-sm mt-4'>
+            <p className='text-gray-400'>Already have an account?</p>
+            <Link to="/login">
+              <span className='text-indigo-600 hover:underline cursor-pointer'>
+                Login
+              </span>
+            </Link>
+          </div>
         </div>
-        <div className='flex flex-col mb-8'>
-          <input 
-            value={email}
-            placeholder='Enter your email'
-            onChange={(e) => setEmail(e.target.value)}
-            className='inputBox'
-            />
-            <label className='errorLabel'>{emailError}</label>
-        </div>
-        <br />
-        <div className='flex flex-col '>
-        <input 
-            type='password'
-            value={password}
-            placeholder='Enter your password'
-            onChange={(e) => setPassword(e.target.value)}
-            className='inputBox'
-        />
-            <label className='errorLabel'>{passwordError}</label>
-        <input 
-            type='password'
-            value={password}
-            placeholder='Confirm your password'
-            onChange={(e) => setPassword(e.target.value)}
-            className='inputBox'
-        />
-            <label className='errorLabel'>{passwordError}</label>
-        </div>
-        <br />
-        <div>
-          <input className="bg-indigo-600" type="button" onClick={onButtonClick} value={'Register'} />
-        </div>
-        <div className='flex gap-2 text-sm'>
-          <p className='text-gray-400'>already had an account?</p>
-          <Link to="/login">
-            <span className='text-indigo-600 hover:underline cursor-pointer'>
-              Login
-            </span>
-          </Link>
-        </div>
+      </div>
     </div>
-    </div>
-    
-  )
+  );
 }
 
 export default RegisterPage;

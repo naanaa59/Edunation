@@ -58,51 +58,56 @@ const LoginPage = () => {
   };
 
   return (
-    <div className='flex'>
-      <div className='hero-bg w-1/2 flex justify-center items-center'>
-        <p className='gothic text-4xl text-center text-black'>Welcome back again</p>
+    <div className='flex flex-col md:flex-row h-screen'>
+      <div className='bg-indigo-600 md:w-1/2 flex justify-center items-center p-4'>
+        <p className='gothic text-2xl md:text-4xl text-center text-white'>Welcome back again</p>
       </div>
-      <div className='w-1/2 flex flex-col items-center justify-center h-screen'>
-        <div className='bg-red-300 '>
-          <div className='gothic text-2xl'>Login</div>
-        </div>
-        <br />
-        <div className='flex flex-col mb-8'>
-          <input 
-            value={email}
-            placeholder='Enter your email'
-            onChange={(e) => setEmail(e.target.value)}
-            className='inputBox'
-          />
-          <label className='errorLabel'>{emailError}</label>
-        </div>
-        <br />
-        <div className='flex flex-col relative mb-8'>
-          <input 
-            type={showPassword ? 'text' : 'password'}
-            value={password}
-            placeholder='Enter your password'
-            onChange={(e) => setPassword(e.target.value)}
-            className='inputBox'
-          />
-          <span
-            className='absolute right-2 top-2 cursor-pointer'
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
-          <label className='errorLabel'>{passwordError}</label>
-        </div>
-        <div className='w-full flex justify-center'>
-          <input className="bg-indigo-600 w-1/2" type="button" onClick={onButtonClick} value={'Log in'} />
-        </div>
-        <div className='flex gap-2 text-sm'>
-          <p className='text-gray-400'>Don't have an account?</p>
-          <Link to="/register">
-            <span className='text-indigo-600 hover:underline cursor-pointer'>
-              Sign up
-            </span>
-          </Link>
+      <div className='md:w-1/2 flex flex-col items-center justify-center p-4'>
+        <div className='bg-blue-100 p-4 w-full max-w-md border border-gray-300 shadow-xl rounded-lg'>
+          <div className='gothic text-2xl text-center mb-4'>Login</div>
+          <form className='space-y-4'>
+            <div className='flex flex-col'>
+              <input 
+                value={email}
+                placeholder='Enter your email'
+                onChange={(e) => setEmail(e.target.value)}
+                className='inputBox p-2 border border-gray-300 rounded'
+              />
+              <label className='errorLabel text-red-600'>{emailError}</label>
+            </div>
+            <div className='flex flex-col relative'>
+              <input 
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                placeholder='Enter your password'
+                onChange={(e) => setPassword(e.target.value)}
+                className='inputBox p-2 border border-gray-300 rounded'
+              />
+              <label className='errorLabel text-red-600'>{passwordError}</label>
+              <span
+                className='absolute right-[1.4rem] top-[1.6rem] transform -translate-y-1/2 cursor-pointer'
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+            </div>
+            <div>
+              <button
+                className="bg-indigo-600 text-white py-2 px-4 rounded w-full"
+                onClick={onButtonClick}
+              >
+                Log in
+              </button>
+            </div>
+          </form>
+          <div className='flex justify-center gap-2 text-sm mt-4'>
+            <p className='text-gray-400'>Don't have an account?</p>
+            <Link to="/register">
+              <span className='text-indigo-600 hover:underline cursor-pointer'>
+                Sign up
+              </span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

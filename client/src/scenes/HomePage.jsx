@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useParams} from 'react'
+import React, {useState, useEffect} from 'react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import HeroSection from '../components/HeroSection'
@@ -22,9 +22,9 @@ const HomePage = () => {
       <Navbar />
       <HeroSection />
       <div className=''>
-      <p className='gothic flex flex-col lg:flex-row justify-center text-3xl py-6'>Available Courses</p>
+      <p className='gothic flex flex-col lg:flex-row justify-center items-center text-3xl py-6'>Available Courses</p>
       <div className='flex flex-col lg:flex-row justify-center'>
-              <div className='grid grid-cols-4 gap-4  p-6'>
+              <div className='grid grid-cols-1 lg:grid-cols-4 gap-4  p-6'>
               {courses.map((course, index) => (
                   <div key={index} className='bg-white rounded-lg shadow-lg overflow-hidden transform transition duration-500 hover:scale-105'>
                   <img
