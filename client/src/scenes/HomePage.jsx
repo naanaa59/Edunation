@@ -27,8 +27,8 @@ const HomePage = () => {
               <div className='grid grid-cols-1 lg:grid-cols-4 gap-4  p-6'>
               {courses.map((course, index) => (
                   <div key={index} className='bg-white rounded-lg shadow-lg overflow-hidden transform transition duration-500 hover:scale-105'>
-                  <img
-                    src={course1}
+                  <img className='w-full h-80 object-cover'
+                    src={course.link_photo}
                     alt='Team Member 1'
                   />
                     <div className='p-4'>

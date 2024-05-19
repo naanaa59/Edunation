@@ -23,7 +23,7 @@ useEffect(() => {
   return (
     <nav className=" bg-white w-full fixed flex flex-row items-center z-10 shadow-2xl">
       <div className="container  flex items-center gap-10">
-      <Link to="/" className="text-lg text-black font-semibold mr-4">
+      <Link to="/" className="w-1/3 lg:w-1/6 my-2">
           <img src={edunation} alt="Edunation" />
         </Link>
         <div className="search">

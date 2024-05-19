@@ -13,12 +13,13 @@ const AboutPage = () => {
     <div>
       <Navbar />
       <div className='h-screen'>
-        <div className='hero-bg h-screen flex items-center justify-center '>
+        <div className='bg-[#ffe1e5]  h-screen flex items-center justify-center '>
           <div className='mx-auto flex flex-col justify-center lg:flex-row'>
               <div className='lg:w-1/2 lg:ml-6 flex flex-col justify-center'>
                   
                     <p className='text-6xl mb-6'>
-                    Welcome to where possibilities 
+                    Welcome to where
+                    possibilities 
                       <Typical
                         steps={[' begin.',' start.',' initiate.','', 2000]}
                         loop={Infinity}
@@ -36,7 +37,7 @@ const AboutPage = () => {
         </div>
       </div>
       
-      <div className='bg-section1 h-screen '>
+      <div className='bg-white h-screen '>
                   <p className='flex flex-col lg:flex-row justify-center text-3xl py-6'>Our Mission</p>
                   <div className='mx-auto flex flex-col justify-center lg:flex-row'>
              

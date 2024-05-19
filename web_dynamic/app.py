@@ -17,6 +17,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
+import os
 
 SECRET_KEY="e13d15c8879290396492efb62d0a424734fadd0727f19789cf62c206e16c5d2cce065e0f314661d64d083938c1ea7400ac423746e6b57c33ab68a711f1a68d91"
 ALGORITHM = "HS256"
@@ -83,7 +84,7 @@ def delete_subject(subject_id):
 @app.route('/instructor/register', methods=['POST'])
 def create_new_instructor():
     data = request.get_json()
-    print(data)
+    # print(data)
     new_instructor = Instructor(**data)
     new_instructor.save()
     return jsonify({'message': 'Instructor created successfully', 'id': new_instructor.id}), 201
@@ -111,7 +112,7 @@ def login_instructor():
             "sub": user.email,
             "exp": datetime.utcnow() + timedelta(minutes=60)
         }
-        print(data["exp"])
+        # print(data["exp"])
         token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
         return jsonify({"access_token": token, "token_type": "Bearer"}), 200
     except HTTPException as e:
@@ -175,7 +176,7 @@ def get_student(student_id):
 @app.route('/student/register', methods=['POST'])
 def create_student():
     data = request.get_json()
-    print(data)
+    # print(data)
 
     new_student = Student(**data)
     new_student.save()
@@ -206,8 +207,8 @@ def login_student():
             "exp": datetime.utcnow() + timedelta(minutes=60),
             "type": user.__class__.__name__
             }
-        print(data["exp"])
-        print("data", data)
+        # print(data["exp"])
+        # print("data", data)
         token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
         return jsonify({"access_token": token, "token_type": "Bearer", "type":user.__class__.__name__}), 200
     except HTTPException as e:
@@ -248,17 +249,16 @@ def get_course(course_id):
     else:
         return jsonify({'message': 'Course not found'}), 404
 
-import os
-from flask import request, jsonify
 
 # Define a base directory for saving files and create a new course
 UPLOAD_FOLDER = 'uploads'
 
 @app.route('/courses/<subject_id>/<instructor_id>', methods=['POST'])
 def create_course(subject_id, instructor_id):
+    print("chil3iba a3chiri")
     data = request.form.to_dict()
     file = request.files.get('link_photo')
-
+    image = file.read()
     if not subject_id or not instructor_id:
         return jsonify({'error': 'subject_id and instructor_id are required'}), 400
 
@@ -273,15 +273,7 @@ def create_course(subject_id, instructor_id):
         return jsonify({'error': "Course is already created"}), 409
 
     course = Course(**data)
-
-    if file:
-        # Create the uploads directory if it doesn't exist
-        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-        
-        # Save the file and set the link_photo attribute
-        file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(file_path)
-        course.link_photo = file_path
+    course.link_photo = upload_picture(image)
 
     inst_c_instance = InstructorCourses(instructor_id=instructor_id, course_id=course.id)
     subject_ins.courses.append(course)
@@ -330,7 +322,7 @@ def get_instructor_courses():
     user = check_token(authorization)
     instructor = storage.get(Instructor, user["id"])
     all_courses  = [inst_course.courses.to_dict() for inst_course in instructor.instructor_courses]
-    print("all courses",all_courses)
+
     return jsonify({"courses": all_courses, "instructor_id": instructor.id})
 
 # This method was for testing without authorization It WORKS :D
@@ -406,13 +398,13 @@ def check_token(authorization: str = None):
         abort(400, description="Authorization header missing or invalid")
     try:
         token = authorization[7:]
-        print(token)
+        # print(token)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        print(payload)
+        # print(payload)
         email = payload.get("sub")
     except jwt.JWTError as e:
 
-        print("Exception: ", e)
+        # print("Exception: ", e)
         abort(401, description="Invalid token")
 
     # Assuming you have a function to get the user by email
@@ -424,9 +416,9 @@ def check_token(authorization: str = None):
 @app.route('/token_check/', methods=['GET'])
 def client_login():
     authorization = request.headers.get('Authorization')
-    print(authorization)
+    # print(authorization)
     user = check_token(authorization)
-    print(user)
+    # print(user)
     return jsonify({"user": user})
 
 # Create getter for the role
@@ -437,6 +429,31 @@ def get_user_type_from_token(token):
         return payload.get('type')
     except jwt.JWTError:
         return None
+
+#Search Api
+@app.route('/courses/search/', methods=['POST'])
+def course_search():
+    data = request.get_json()
+    title = data.get("title")
+    print("title: ",title)
+    if not title:
+        return jsonify([])
+    return jsonify(storage.search(title))
+    
+# Image Uploader
+from PIL import Image
+from io import BytesIO
+from os import getenv
+import requests
+
+IMG_BB_TOKEN = getenv("IMG_BB_TOKEN")
+IMG_BB_URL = getenv("IMG_BB_URL")
+
+def upload_picture(img):
+    """ This fucntion uploads an image intp IMG BB web site """
+    res = requests.post(IMG_BB_URL, files={"image": img},
+                        data={"key": IMG_BB_TOKEN})
+    return res.json()["data"]["display_url"]
 
 if __name__ == '__main__':
     app.run(debug=True)

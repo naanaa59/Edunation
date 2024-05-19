@@ -108,6 +108,7 @@ class DBStorage:
             ).first()
         return inst
     
+    
     def is_student_enrolled(self, student_id, course_id):
         """ Check if the student is already enrolled in the course """
         existing_enrollment = self.__session.query(StudentCourses).filter_by(
@@ -122,3 +123,11 @@ class DBStorage:
     def rollback_db(self):
         """ performs a rollback to undo a insert"""
         self.__session.rollback()
+
+    def search(self, name):
+        """ This method is responsible for the search engine """
+        courses = self.__session.query(Course.title, Course.id)\
+            .filter(Course.title.ilike(name + "%"))\
+            .offset(0).limit(10).all()
+        courses = [{"title": course.title, "id": course.id} for course in courses]
+        return courses

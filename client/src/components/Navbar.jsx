@@ -13,6 +13,10 @@ import UserMenu from './UserMenu'
 const Navbar = () => {
   const [subjects, setSubjects] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // eslint-disable-next-line
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
 
 useEffect(() => {
   const check_token = async () => {
@@ -40,6 +44,38 @@ useEffect(() => {
      })
      .catch(error => console.error('Error:', error));
  }, []);
+
+ const searchHandler = async (e) => {
+  const searchValue = e.target.value;
+  setSearchTerm(searchValue);
+  console.log(searchValue);
+  if (!searchValue.trim() === '') {
+    setIsSearchVisible(false);
+    return;
+  }
+  try {
+    const response = await fetch('http://localhost:5003/courses/search/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ "title": searchValue }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    // Handle the search result (e.g., update the state to display search results)
+    console.log("searchResult:", data);
+    setSearchResults(data);
+    setIsSearchVisible(true) // Replace with your logic to display search results
+  } catch (error) {
+    console.error(error);
+    setIsSearchVisible(false);
+    // Handle the error (e.g., show an error message to the user)
+  }
+ };
 
 
   return (
@@ -86,7 +122,27 @@ useEffect(() => {
           <form className="search-form flex items-center ">
             <div className="relative">
               {/* Search Input */}
-              <input type="search" id="default-search" className="flex-grow pl-8 pr-2 py-2 text-sm text-gray-900  rounded-lg bg-gray-400 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-800 dark:placeholder-white dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-white" placeholder="Search..." required />
+              <input
+                type="search"
+                id="default-search"
+                onChange={searchHandler}
+                className="flex-grow pl-8 pr-2 py-2 text-sm text-gray-900 rounded-lg bg-gray-400 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-800 dark:placeholder-white dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 placeholder-white"
+                placeholder="Search..."
+                required
+              />
+              {searchResults.length > 0 && (
+                <div className='absolute backdrop-blur-xl bg-gray rounded-lg shadow-xl w-full py-4 mt-[0.36rem] border border-gray-300'>
+                  <ul className='container' id='searchContainer'>
+                    {searchResults.map((result, index) => (
+                      <li key={index}>
+                        <Link to={`/courses/${result.id}`}>
+                          {result.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               {/* SVG Icon */}
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg className="search-logo w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -95,7 +151,7 @@ useEffect(() => {
               </div>
             </div>
             {/* Submit Button */}
-            <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+            <button type="submit"  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
           </form>
         </div> 
     </div>

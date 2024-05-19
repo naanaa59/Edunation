@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import NavInst from '../components/NavInst';
 import { useNavigate } from 'react-router-dom';
-import oneCall from '../components/inputHandler';
 
 const InstructorPage = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -91,6 +90,17 @@ const InstructorPage = () => {
         navigate('/404');
     }
 };
+const oneCall = (callback) => {
+  let called = false;
+
+  return (...args) => {
+    if (!called) {
+      called = true;
+      return callback(...args);
+    }
+  };
+}
+const createCourseAdv = oneCall(createCourse);
 
 const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,7 +112,7 @@ const handleSubmit = async (e) => {
     const subject_id = formData.get('subject_id');
     const userId = userInfo.id;
 
-    await createCourse(courseData, subject_id, userId, img);
+    await createCourseAdv(courseData, subject_id, userId, img);
 };
 
   const deleteCourse = async (courseId) => {
