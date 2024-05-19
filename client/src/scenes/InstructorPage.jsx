@@ -10,6 +10,7 @@ const InstructorPage = () => {
   const navigate = useNavigate();
   const [img, setImg] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+
   const fetchCourses = useCallback(async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -90,6 +91,7 @@ const InstructorPage = () => {
         navigate('/404');
     }
 };
+
 const oneCall = (callback) => {
   let called = false;
 
@@ -165,66 +167,68 @@ const handleSubmit = async (e) => {
     setSelectedImage(URL.createObjectURL(e.target.files[0]));
   };
 
-
-
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
       <NavInst />
-      <div className="bg-gray-100 px-4 pt-20">
+      <div className="container mx-auto px-4 pt-20">
         {userInfo ? (
           <div>
-            <h2 className='text-xl gothic'>Welcome, {userInfo.first_name} {userInfo.last_name}!</h2>
+            <h2 className='text-2xl font-semibold text-gray-800'>Welcome, {userInfo.first_name} {userInfo.last_name}!</h2>
           </div>
         ) : (
           <div>No user data</div>
         )}
 
-        <h2 className="text-xl font-bold mb-4">Courses</h2>
+        <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-800">Courses</h2>
         {userCourses.length === 0 ? (
-          <p className="text-xl text-black">Unfortunately, you don't have courses yet</p>
+          <p className="text-lg text-gray-600">Unfortunately, you don't have courses yet</p>
         ) : (
-          userCourses.map((course) => (
-            <div key={course.id} className="mb-4 bg-white shadow-md rounded p-4">
-              <img src={course.link_photo} alt={course.title} className="mt-2 w-[240px] h-auto object-cover transition-transform duration-200 hover:scale-105" />
-              <h3 className="font-semibold">{course.title}</h3>
-              <h3 className="font-semibold">{course.description}</h3>
-              <button onClick={() => deleteCourse(course.id)} className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Delete</button>
-            </div>
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userCourses.map((course) => (
+              <div key={course.id} className="bg-white shadow-md rounded-lg p-4">
+                <img src={course.link_photo} alt={course.title} className="mt-2 w-full h-48 object-cover rounded-md transition-transform duration-200 hover:scale-105" />
+                <h3 className="text-xl font-semibold mt-4">{course.title}</h3>
+                <p className="text-gray-600 mt-2">{course.description}</p>
+                <button onClick={() => deleteCourse(course.id)} className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">Delete</button>
+              </div>
+            ))}
+          </div>
         )}
 
-        <h2 className="text-xl font-bold mt-8">Subjects</h2>
-        {subjects.map((subject) => (
-          <div key={subject.id} className="mb-4 bg-white shadow-md rounded p-4">
-            <h3 className="font-semibold">{subject.name}</h3>
+        <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-800">Subjects</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {subjects.map((subject) => (
+            <div key={subject.id} className="bg-white shadow-md rounded-lg p-4">
+              <h3 className="text-xl font-semibold">{subject.name}</h3>
+              <p className="text-gray-600 mt-2">{subject.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-800">Create Course</h2>
+        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6 space-y-4">
+          <input type="text" name="title" placeholder="Course Title" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
+          <input type="text" name="description" placeholder="Course Description" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
+          <select name="subject_id" className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none">
+            {subjects.map((subject) => (
+              <option key={subject.id} value={subject.id}>{subject.name}</option>
+            ))}
+          </select>
+          <div className="imageCon w-[300px] mt-4">
+            {selectedImage && <img src={selectedImage} alt="SelectedImage" className="w-full h-48 object-cover rounded-md" />}
           </div>
-        ))}
+          <label htmlFor="imageHandler" className='mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 cursor-pointer inline-block'>Upload Course Image</label>
+          <input onChange={inputFile} id="imageHandler" type="file" name="link_photo" accept="image/jpeg" className="hidden" />
+          <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Create Course</button>
+        </form>
 
-        <h2 className="text-xl font-bold mt-8">Create Course</h2>
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-    <input type="text" name="title" placeholder="Course Title" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
-    <input type="text" name="description" placeholder="Course Description" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
-    <select name="subject_id" className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none">
-        {subjects.map((subject) => (
-            <option key={subject.id} value={subject.id}>{subject.name}</option>
-        ))}
-    </select>
-    <div className="imageCon w-[300px]">
-        {selectedImage && <img src={selectedImage} alt="SelectedImage" />}
-    </div>
-    <label htmlFor="imageHandler" className='px-4 py-2 bg-indigo-600 text-white rounded hover:bg-blue-600'>Upload Course's Image</label>
-    <input onChange={inputFile} id="imageHandler" type="file" name="link_photo" accept="image/jpeg" className="w-full px-3 py-2 hidden border rounded focus:border-blue-500 focus:outline-none" />
-    <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Create Course</button>
-</form>
-
-
-        <h2 className="text-xl font-bold mt-8">Create Subject</h2>
+        <h2 className="text-2xl font-bold mt-8 mb-4 text-gray-800">Create Subject</h2>
         <form onSubmit={(e) => {
           e.preventDefault();
           const formData = new FormData(e.target);
           const subjectData = Object.fromEntries(formData.entries());
           createSubject(subjectData);
-        }} className="mt-8 space-y-4">
+        }} className="bg-white shadow-md rounded-lg p-6 space-y-4">
           <input type="text" name="name" placeholder="Subject Name" required className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none" />
           <textarea name="description" placeholder="Description" className="w-full px-3 py-2 border rounded focus:border-blue-500 focus:outline-none mt-2"></textarea>
           <button type="submit" className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">Create Subject</button>

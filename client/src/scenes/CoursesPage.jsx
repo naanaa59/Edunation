@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import coursepic from '../images/infocourse.jpeg'
-import { useNavigate,  useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import coursepic from '../images/infocourse.jpeg';
+import { useNavigate, useParams } from 'react-router-dom';
 
-
-
-const CousesPage = () => {
-  const [courseInfo, setCourseInfo] = useState([]);
+const CoursesPage = () => {
+  const [courseInfo, setCourseInfo] = useState({});
   const [enrollmentMessage, setEnrollmentMessage] = useState('');
   const { courseId } = useParams();
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +19,7 @@ const CousesPage = () => {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
-          }
+          },
         });
         const courseResponse = await fetch(`http://0.0.0.0:5003/courses/${courseId}`, {
           method: 'GET',
@@ -32,10 +29,6 @@ const CousesPage = () => {
         });
         if (result.ok) {
           console.log("ok");
-          console.log("result:", result);
-          // const userInfo = await result.json();
-          // setUserInfo(userInfo.user);
-          console.log("CourseResponse:", courseResponse);
           const course = await courseResponse.json();
           console.log("course info: ", course);
           setCourseInfo(course);
@@ -49,7 +42,6 @@ const CousesPage = () => {
     checkToken();
   }, [navigate, courseId]);
 
-
   const enrollStudent = async () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -59,42 +51,32 @@ const CousesPage = () => {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
-          }
+          },
         });
       
-      const userInfo = await result.json();
-      // setUserInfo(userInfo.user);
-      const student = userInfo.user;
-      const enrollResponse = await fetch(`http://0.0.0.0:5003/courses/${courseId}/enroll/${student.id}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      if (enrollResponse.ok) {
-        const data = await enrollResponse.json();
-        console.log("Enroll data:", data.message);
-        setEnrollmentMessage('Enrollment successful!')
-      } else if (enrollResponse.status === 400) {
-        console.log("You have already enrolled in that course");
-        setEnrollmentMessage('You have already enrolled in that course');
-
-      } else {
-        console.log(`Failed to enroll student: ${enrollResponse.status}`);
+        const userInfo = await result.json();
+        const student = userInfo.user;
+        const enrollResponse = await fetch(`http://0.0.0.0:5003/courses/${courseId}/enroll/${student.id}`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (enrollResponse.ok) {
+          const data = await enrollResponse.json();
+          console.log("Enroll data:", data.message);
+          setEnrollmentMessage('Enrollment successful!');
+        } else if (enrollResponse.status === 400) {
+          console.log("You have already enrolled in that course");
+          setEnrollmentMessage('You have already enrolled in that course');
+        } else {
+          console.log(`Failed to enroll student: ${enrollResponse.status}`);
+        }
       }
-      // if (!enrollResponse.ok) {
-      //   throw new Error('Failed to enroll student');
-      // }
-      // const data = await enrollResponse.json();
-      // console.log("enroll data", data.message);
-    } 
     } catch (error) {
       console.log(error);
-      // navigate('/404'); 
     }
   };
-
-  
 
   if (!courseInfo) {
     return <div>Loading...</div>;
@@ -103,23 +85,33 @@ const CousesPage = () => {
   return (
     <div>
       <Navbar />
-      <div className='h-screen container'>
-        <img src={coursepic} alt="coursepic" className=' pt-20 h-[50%]' />
-        <p className='pt-20'>{courseInfo.title}</p>
-        <p>{courseInfo.description}</p>
-        <div className='lg:max-w flex '>
-          <button onClick={() => enrollStudent(1)} className="rounded-md px-3.5 py-2 m-1 overflow-hidden relative group cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600">
-            <span className="absolute inset-0 bg-indigo-600 transition-all duration-500 ease-in-out transform origin-left scale-x-0 group-hover:scale-x-100"></span>
-            <span className="relative text-indigo-600 transition duration-300 group-hover:text-white ease tracking-wider"> Enroll </span>
-          </button>
-          
+      <div className='min-h-screen bg-gray-100'>
+        <div className='container mx-auto pt-20 px-4'>
+          <div className='relative'>
+            <img src={courseInfo.link_photo} alt="coursepic" className='w-full h-64 object-cover rounded-lg shadow-lg' />
+            <div className='absolute inset-0 bg-black opacity-50 rounded-lg'></div>
+            <div className='absolute inset-0 flex items-center justify-center'>
+              <h1 className='text-4xl font-bold text-white'>{courseInfo.title}</h1>
+            </div>
+          </div>
+          <div className='mt-8 bg-white shadow-md rounded-lg p-6'>
+            <p className='text-lg text-gray-700'>{courseInfo.description}</p>
+            <div className='flex justify-center mt-6'>
+              <button
+                onClick={enrollStudent}
+                className="rounded-md px-6 py-3 relative overflow-hidden group cursor-pointer border-2 font-medium border-indigo-600 text-indigo-600"
+              >
+                <span className="absolute inset-0 bg-indigo-600 transition-transform duration-500 ease-in-out transform scale-x-0 group-hover:scale-x-100"></span>
+                <span className="relative text-indigo-600 transition duration-300 group-hover:text-white">Enroll</span>
+              </button>
+            </div>
+            {enrollmentMessage && <p className='mt-4 text-center text-green-600'>{enrollmentMessage}</p>}
+          </div>
         </div>
-        {enrollmentMessage && <p className='mt-2 text-gray-600'>{enrollmentMessage}</p>}
       </div>
-      
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default CousesPage
+export default CoursesPage;
